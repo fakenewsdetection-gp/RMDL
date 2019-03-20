@@ -132,9 +132,21 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
     print('Total %s word vectors.' % len(embeddings_index))
     return (X_train, X_test, word_index,embeddings_index)
 
+def loadBiasLexicon(path):
+    with open(path) as f:
+        return [line for line in f]
+
 def loadData(X_train, X_test,MAX_NB_WORDS=75000):
     vectorizer_x = TfidfVectorizer(max_features=MAX_NB_WORDS)
+    bias_lexicon = loadBiasLexicon('bias-lexicon.txt')
     X_train = vectorizer_x.fit_transform(X_train).toarray()
+    vocab = [] * len(vectorizer_x.vocabulary_)
+    for key, val in vectorizer_x.vocabulary_:
+        vocab[val] = key
+    X_train_bias = [[vec[i] if vocab[i] in bias_lexicon else 0 for i in range(len(vec))] for vec in X_train]
+    X_train = np.concatenate((X_train, X_train_bias), axis=1)
     X_test = vectorizer_x.transform(X_test).toarray()
+    X_test_bias = [[vec[i] if vocab[i] in bias_lexicon else 0 for i in range(len(vec))] for vec in X_test]
+    X_test = np.concatenate((X_test, X_test_bias), axis=1)
     print("tf-idf with",str(np.array(X_train).shape[1]),"features")
     return (X_train,X_test)
