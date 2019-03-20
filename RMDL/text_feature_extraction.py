@@ -118,13 +118,14 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
     X_train = text[0:len(X_train), ]
     X_test = text[len(X_train):, ]
     embeddings_index = {}
+    bias_lexicon = loadBiasLexicon('bias-lexicon.txt')
     f = open(GloVe_DIR, encoding="utf8")
     for line in f:
 
         values = line.split()
         word = values[0]
         try:
-            coefs = np.asarray(values[1:], dtype='float32')
+            coefs = np.asarray(values[1:] + [1 if word in bias_lexicon else 0], dtype='float32')
         except:
             pass
         embeddings_index[word] = coefs
