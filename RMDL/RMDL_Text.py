@@ -104,7 +104,6 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
     """
     np.random.seed(random_state)
 
-
     glove_directory = GloVe_dir
     GloVe_file = GloVe_file
 
@@ -178,14 +177,16 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
         number_of_classes = no_of_classes
     print(number_of_classes)
 
+    models_dir = "./models"
+    weights_dir = "./weights"
 
     i = 0
     while i < random_deep[0]:
         try:
             print("DNN " + str(i))
-            model_filepath = "models\wDNN_" + str(i) + ".json"
-            weights_filepath = "models\wDNN_" + str(i) + "_weights.hdf5"
-            checkpoint = ModelCheckpoint(weights_filepath,
+            model_filepath = "DNN_" + str(i) + ".json"
+            weights_filepath = "DNN_" + str(i) + ".hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
                                          monitor='val_acc',
                                          verbose=1,
                                          save_best_only=True,
@@ -201,7 +202,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                                                                 random_optimizor,
                                                                 dropout)
             model_json = model_DNN.to_json()
-            with open(filepath, "w") as model_json_file:
+            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
             model_history = model_DNN.fit(x_train_tfidf, y_train,
                               validation_data=(x_test_tfidf, y_test),
@@ -230,9 +231,9 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
     while i < random_deep[1]:
         try:
             print("RNN " + str(i))
-            model_filepath = "models\wRNN_" + str(i) + ".json"
-            weights_filepath = "models\wRNN_" + str(i) + "_weights.hdf5"
-            checkpoint = ModelCheckpoint(weights_filepath,
+            model_filepath = "RNN_" + str(i) + ".json"
+            weights_filepath = "RNN_" + str(i) + ".hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
                                          monitor='val_acc',
                                          verbose=1,
                                          save_best_only=True,
@@ -251,7 +252,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                                                                 random_optimizor,
                                                                 dropout)
             model_json = model_RNN.to_json()
-            with open(filepath, "w") as model_json_file:
+            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
             model_history = model_RNN.fit(x_train_embedded, y_train,
                               validation_data=(x_test_embedded, y_test),
@@ -275,9 +276,9 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
     while i < random_deep[2]:
         try:
             print("CNN " + str(i))
-            model_filepath = "models\wCNN_" + str(i) + ".json"
-            weights_filepath = "models\wCNN_" + str(i) + "_weights.hdf5"
-            checkpoint = ModelCheckpoint(weights_filepath,
+            model_filepath = "CNN_" + str(i) + ".json"
+            weights_filepath = "CNN_" + str(i) + ".hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
                                          monitor='val_acc',
                                          verbose=1,
                                          save_best_only=True,
@@ -295,6 +296,9 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                                                                 max_nodes_cnn,
                                                                 random_optimizor,
                                                                 dropout)
+            model_json = model_CNN.to_json()
+            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
+                model_json_file.write(model_json)
             model_history = model_CNN.fit(x_train_embedded, y_train,
                                           validation_data=(x_test_embedded, y_test),
                                           epochs=epochs[2],

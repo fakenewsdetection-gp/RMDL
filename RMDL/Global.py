@@ -20,7 +20,7 @@ import os
 def setup():
     np.set_printoptions(threshold=np.inf)
     np.random.seed(7)
-    if not os.path.exists(".\weights"):
-        os.makedirs(".\weights")
-
-
+    if not os.path.isdir("./models"):
+        os.makedirs("./models")
+    if not os.path.isdir("./weights"):
+        os.makedirs("./weights")
