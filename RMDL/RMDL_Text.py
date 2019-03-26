@@ -30,29 +30,27 @@ from RMDL import Global as G
 from RMDL import Plot as Plot
 
 
-def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
-                        EMBEDDING_DIM=50,MAX_SEQUENCE_LENGTH=500, MAX_NB_WORDS=75000,
-                        GloVe_dir="", GloVe_file="glove.6B.50d.txt",
-                        sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],  plot=False,
-                        min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
-                        min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
-                        min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-                        random_state=42, random_optimizor=True, dropout=0.5,no_of_classes=0):
-
-
+def train(x_train, y_train, x_val,  y_val, batch_size=128,
+            embedding_dim=50, max_sequence_length=500, max_nb_words=75000,
+            glove_dir="", glove_file="glove.6B.50d.txt",
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
+            min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
+            min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
+            min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
+            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
     """
-    Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
-                        EMBEDDING_DIM=50,MAX_SEQUENCE_LENGTH = 500, MAX_NB_WORDS = 75000,
-                        GloVe_dir="", GloVe_file = "glove.6B.50d.txt",
-                        sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],  plot=False,
-                        min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
-                        min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
-                        min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-                        random_state=42, random_optimizor=True, dropout=0.5):
+    train(x_train, y_train, x_val,  y_val, batch_size=128,
+            embedding_dim=50, max_sequence_length=500, max_nb_words=75000,
+            glove_dir="", glove_file="glove.6B.50d.txt",
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
+            min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
+            min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
+            min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
+            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
 
         Parameters
         ----------
-            batch_size : Integer, , optional
+            batch_size: Integer, , optional
                 Number of samples per gradient update. If unspecified, it will default to 128
             MAX_NB_WORDS: int, optional
                 Maximum number of unique words in datasets, it will default to 75000.
@@ -93,78 +91,65 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                 Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 128.
             min_nodes_cnn: Integer, optional
                 Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 512.
-            random_state : Integer, optional
+            random_state: Integer, optional
                 RandomState instance or None, optional (default=None)
                 If Integer, random_state is the seed used by the random number generator;
-            random_optimizor : bool, optional
+            random_optimizor: bool, optional
                 If False, all models use adam optimizer. If True, all models use random optimizers. it will default to True
             dropout: Float, optional
                 between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs.
-
+            no_of_classes: Integer, optional
+                If 0, number of classes is induced from the given labels.
+                Else number of classes will be set to the given no_of_classes parameter.
     """
     np.random.seed(random_state)
 
-    glove_directory = GloVe_dir
-    GloVe_file = GloVe_file
+    models_dir = "models"
+    weights_dir = "weights"
 
-    print("Done1")
+    history = []
 
-    GloVe_needed = random_deep[1] != 0 or random_deep[2] != 0
-
-    # example_input  = [0,1,3]
-    # example_output :
-    #
-    # [[1 0 0 0]
-    #  [0 1 0 0]
-    #  [0 0 0 1]]
+    glove_needed = random_deep[1] != 0 or random_deep[2] != 0
 
     def one_hot_encoder(value, label_data_):
-
         label_data_[value] = 1
-
         return label_data_
 
-    def _one_hot_values(labels_data):
+    def get_one_hot_values(labels_data):
         encoded = [0] * len(labels_data)
-
         for index_no, value in enumerate(labels_data):
             max_value = [0] * (np.max(labels_data) + 1)
-
             encoded[index_no] = one_hot_encoder(value, max_value)
-
         return np.array(encoded)
 
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error
         print("converted_into_one_hot")
-        y_train = _one_hot_values(y_train)
-        y_test = _one_hot_values(y_test)
+        y_train = get_one_hot_values(y_train)
+        y_val = get_one_hot_values(y_val)
 
-    if GloVe_needed:
-        if glove_directory == "":
-            GloVe_directory = GloVe.download_and_extract()
-            GloVe_DIR = os.path.join(GloVe_directory, GloVe_file)
+    if glove_needed:
+        if glove_dir == "":
+            glove_dir = GloVe.download_and_extract()
+            glove_path = os.path.join(glove_dir, glove_file)
         else:
-            GloVe_DIR = os.path.join(glove_directory, GloVe_file)
+            glove_path = os.path.join(glove_dir, glove_file)
 
-        if not os.path.isfile(GloVe_DIR):
+        if not os.path.isfile(glove_path):
             print("Could not find %s Set GloVe Directory in Global.py ", GloVe)
             exit()
 
     G.setup()
     if random_deep[0] != 0:
-        x_train_tfidf, x_test_tfidf = txt.loadData(x_train, x_test,MAX_NB_WORDS=MAX_NB_WORDS)
+        x_train_tfidf, x_val_tfidf = txt.loadData(x_train, x_val, MAX_NB_WORDS=max_nb_words)
     if random_deep[1] != 0 or random_deep[2] != 0 :
-        print(GloVe_DIR)
-        x_train_embedded, x_test_embedded, word_index, embeddings_index = txt.loadData_Tokenizer(x_train, x_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM)
-
+        print(glove_path)
+        x_train_embedded, x_val_embedded, word_index, embeddings_index = txt.loadData_Tokenizer(x_train, x_val,
+                                                                                                glove_path, max_nb_words,
+                                                                                                max_sequence_length, embedding_dim)
     del x_train
-    del x_test
+    del x_val
     gc.collect()
-
-    y_pr = []
-    History = []
-    score = []
 
     if no_of_classes==0:
         #checking no_of_classes
@@ -175,23 +160,18 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             number_of_classes = len(y_train[0])
     else:
         number_of_classes = no_of_classes
-    print(number_of_classes)
-
-    models_dir = "./models"
-    weights_dir = "./weights"
 
     i = 0
     while i < random_deep[0]:
         try:
-            print("DNN " + str(i))
+            print("Building and Training DNN-%d", i)
             model_filepath = "DNN_" + str(i) + ".json"
             weights_filepath = "DNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
-                                         monitor='val_acc',
-                                         verbose=1,
-                                         save_best_only=True,
-                                         mode='max')
-            callbacks_list = [checkpoint]
+                                            monitor='val_acc',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='max')
             model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tfidf.shape[1],
                                                                 number_of_classes,
                                                                 sparse_categorical,
@@ -205,12 +185,12 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
             model_history = model_DNN.fit(x_train_tfidf, y_train,
-                              validation_data=(x_test_tfidf, y_test),
-                              epochs=epochs[0],
-                              batch_size=batch_size,
-                              callbacks=callbacks_list,
-                              verbose=2)
-            History.append(model_history)
+                                            validation_data=(x_val_tfidf, y_val),
+                                            epochs=epochs[0],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2)
+            history.append(model_history)
             i += 1
             del model_DNN
         except Exception as e:
@@ -220,30 +200,26 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                 max_hidden_layer_dnn -= 1
             if max_nodes_dnn > 256:
                 max_nodes_dnn -= 8
-    try:
-        del x_train_tfidf
-        del x_test_tfidf
-        gc.collect()
-    except:
-        pass
+    del x_train_tfidf
+    del x_val_tfidf
+    gc.collect()
 
     i=0
     while i < random_deep[1]:
         try:
-            print("RNN " + str(i))
+            print("Building and Training RNN-%d", i)
             model_filepath = "RNN_" + str(i) + ".json"
             weights_filepath = "RNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
-                                         monitor='val_acc',
-                                         verbose=1,
-                                         save_best_only=True,
-                                         mode='max')
-            callbacks_list = [checkpoint]
+                                            monitor='val_acc',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='max')
             model_RNN, _ = BuildModel.Build_Model_RNN_Text(word_index,
                                                                 embeddings_index,
                                                                 number_of_classes,
-                                                                MAX_SEQUENCE_LENGTH,
-                                                                EMBEDDING_DIM,
+                                                                max_sequence_length,
+                                                                embedding_dim,
                                                                 sparse_categorical,
                                                                 min_hidden_layer_rnn,
                                                                 max_hidden_layer_rnn,
@@ -255,12 +231,12 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
             model_history = model_RNN.fit(x_train_embedded, y_train,
-                              validation_data=(x_test_embedded, y_test),
-                              epochs=epochs[1],
-                              batch_size=batch_size,
-                              callbacks=callbacks_list,
-                              verbose=2)
-            History.append(model_history)
+                                            validation_data=(x_val_embedded, y_val),
+                                            epochs=epochs[1],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2)
+            history.append(model_history)
             i += 1
             del model_RNN
             gc.collect()
@@ -275,20 +251,19 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
     i = 0
     while i < random_deep[2]:
         try:
-            print("CNN " + str(i))
+            print("Building and Training CNN-%d", i)
             model_filepath = "CNN_" + str(i) + ".json"
             weights_filepath = "CNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
-                                         monitor='val_acc',
-                                         verbose=1,
-                                         save_best_only=True,
-                                         mode='max')
-            callbacks_list = [checkpoint]
+                                            monitor='val_acc',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='max')
             model_CNN, _ = BuildModel.Build_Model_CNN_Text(word_index,
                                                                 embeddings_index,
                                                                 number_of_classes,
-                                                                MAX_SEQUENCE_LENGTH,
-                                                                EMBEDDING_DIM,
+                                                                max_sequence_length,
+                                                                embedding_dim,
                                                                 sparse_categorical,
                                                                 min_hidden_layer_cnn,
                                                                 max_hidden_layer_cnn,
@@ -300,12 +275,12 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
             model_history = model_CNN.fit(x_train_embedded, y_train,
-                                          validation_data=(x_test_embedded, y_test),
-                                          epochs=epochs[2],
-                                          batch_size=batch_size,
-                                          callbacks=callbacks_list,
-                                          verbose=2)
-            History.append(model_history)
+                                            validation_data=(x_val_embedded, y_val),
+                                            epochs=epochs[2],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2)
+            history.append(model_history)
             i += 1
             del model_CNN
             gc.collect()
@@ -316,4 +291,3 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             if max_nodes_cnn > 128:
                 max_nodes_cnn -= 2
                 min_nodes_cnn -= 1
-    gc.collect()
