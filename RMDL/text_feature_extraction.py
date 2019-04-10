@@ -22,14 +22,22 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 import re
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-
+import cpickle as pickle
 
 nltk.download("stopwords")
 cachedStopWords = stopwords.words("english")
 
 
 def transliterate(line):
-    cedilla2latin = [[u'Á', u'A'], [u'á', u'a'], [u'Č', u'C'], [u'č', u'c'], [u'Š', u'S'], [u'š', u's']]
+    cedilla2latin = [
+        [u'Á', u'A'],
+        [u'á', u'a'],
+        [u'Č', u'C'],
+        [u'č', u'c'],
+        [u'Š', u'S'],
+        [u'š', u's']
+    ]
+
     tr = dict([(a[0], a[1]) for (a) in cedilla2latin])
     new_line = ""
     for letter in line:
@@ -93,6 +101,7 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
             text = text.strip()
     return text.lower()
 
+
 def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM):
     np.random.seed(7)
     text = np.concatenate((X_train, X_test), axis=0)
@@ -124,9 +133,17 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
     print('Total %s word vectors.' % len(embeddings_index))
     return (X_train, X_test, word_index,embeddings_index)
 
-def loadData(X_train, X_test,MAX_NB_WORDS=75000):
-    vectorizer_x = TfidfVectorizer(max_features=MAX_NB_WORDS)
-    X_train = vectorizer_x.fit_transform(X_train).toarray()
-    X_test = vectorizer_x.transform(X_test).toarray()
-    print("tf-idf with",str(np.array(X_train).shape[1]),"features")
-    return (X_train,X_test)
+
+def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=None):
+    text_tf_idf = None
+    if fit:
+        vectorizer = TfidfVectorizer(max_features=max_num_words)
+        text_tf_idf = vectorizer.fit_transform(text).toarray()
+        pickle.dump(vectorizer, open("tf_idf_vectorizer.pkl", "wb"))
+    else:
+        if vectorizer_filepath is not None:
+            vectorizer = pickle.load(open(vectorizer_filepath, "rb"))
+            text_tf_idf = vectorizer.transform(text).toarray()
+        else:
+            raise Exception("Pickle file for tf-idf vectorizer is not specified.")
+    return text_tf_idf
