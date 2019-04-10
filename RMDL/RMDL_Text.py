@@ -30,6 +30,19 @@ from RMDL import Global as G
 from RMDL import Plot as Plot
 
 
+def one_hot_encoder(value, label):
+    label[value] = 1
+    return label
+
+
+def get_one_hot_values(labels):
+    encoded = [0] * len(labels)
+    for index_no, value in enumerate(labels):
+        max_value = [0] * (np.max(labels) + 1)
+        encoded[index_no] = one_hot_encoder(value, max_value)
+    return np.array(encoded)
+
+
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_sequence_length=500, max_nb_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
@@ -50,16 +63,16 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
 
         Parameters
         ----------
-            batch_size: Integer, , optional
+            batch_size: int, optional
                 Number of samples per gradient update. If unspecified, it will default to 128
             MAX_NB_WORDS: int, optional
                 Maximum number of unique words in datasets, it will default to 75000.
-            GloVe_dir: String, optional
+            GloVe_dir: string, optional
                 Address of GloVe or any pre-trained directory, it will default to null which glove.6B.zip will be download.
-            GloVe_dir: String, optional
+            GloVe_dir: string, optional
                 Which version of GloVe or pre-trained word emending will be used, it will default to glove.6B.50d.txt.
                 NOTE: if you use other version of GloVe EMBEDDING_DIM must be same dimensions.
-            sparse_categorical: bool.
+            sparse_categorical: bool
                 When target's dataset is (n,1) should be True, it will default to True.
             random_deep: array of int [3], optional
                 Number of ensembled model used in RMDL random_deep[0] is number of DNN, random_deep[1] is number of RNN, random_deep[0] is number of CNN, it will default to [3, 3, 3].
@@ -67,38 +80,38 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                 Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNN, epochs[1] is number of epochs used in RNN, epochs[0] is number of epochs used in CNN, it will default to [500, 500, 500].
             plot: bool, optional
                 True: shows confusion matrix and accuracy and loss
-            min_hidden_layer_dnn: Integer, optional
+            min_hidden_layer_dnn: int, optional
                 Lower Bounds of hidden layers of DNN used in RMDL, it will default to 1.
-            max_hidden_layer_dnn: Integer, optional
+            max_hidden_layer_dnn: int, optional
                 Upper bounds of hidden layers of DNN used in RMDL, it will default to 8.
-            min_nodes_dnn: Integer, optional
+            min_nodes_dnn: int, optional
                 Lower bounds of nodes in each layer of DNN used in RMDL, it will default to 128.
-            max_nodes_dnn: Integer, optional
+            max_nodes_dnn: int, optional
                 Upper bounds of nodes in each layer of DNN used in RMDL, it will default to 1024.
-            min_hidden_layer_rnn: Integer, optional
+            min_hidden_layer_rnn: int, optional
                 Lower Bounds of hidden layers of RNN used in RMDL, it will default to 1.
-            min_hidden_layer_rnn: Integer, optional
+            min_hidden_layer_rnn: int, optional
                 Upper Bounds of hidden layers of RNN used in RMDL, it will default to 5.
-            min_nodes_rnn: Integer, optional
+            min_nodes_rnn: int, optional
                 Lower bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, it will default to 32.
-            max_nodes_rnn: Integer, optional
+            max_nodes_rnn: int, optional
                 Upper bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, it will default to 128.
-            min_hidden_layer_cnn: Integer, optional
+            min_hidden_layer_cnn: int, optional
                 Lower Bounds of hidden layers of CNN used in RMDL, it will default to 3.
-            max_hidden_layer_cnn: Integer, optional
+            max_hidden_layer_cnn: int, optional
                 Upper Bounds of hidden layers of CNN used in RMDL, it will default to 10.
-            min_nodes_cnn: Integer, optional
+            min_nodes_cnn: int, optional
                 Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 128.
-            min_nodes_cnn: Integer, optional
+            min_nodes_cnn: int, optional
                 Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 512.
-            random_state: Integer, optional
+            random_state: int, optional
                 RandomState instance or None, optional (default=None)
                 If Integer, random_state is the seed used by the random number generator;
             random_optimizor: bool, optional
                 If False, all models use adam optimizer. If True, all models use random optimizers. it will default to True
-            dropout: Float, optional
+            dropout: float, optional
                 between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs.
-            no_of_classes: Integer, optional
+            no_of_classes: int, optional
                 If 0, number of classes is induced from the given labels.
                 Else number of classes will be set to the given no_of_classes parameter.
     """
@@ -110,17 +123,6 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     history = []
 
     glove_needed = random_deep[1] != 0 or random_deep[2] != 0
-
-    def one_hot_encoder(value, label_data_):
-        label_data_[value] = 1
-        return label_data_
-
-    def get_one_hot_values(labels_data):
-        encoded = [0] * len(labels_data)
-        for index_no, value in enumerate(labels_data):
-            max_value = [0] * (np.max(labels_data) + 1)
-            encoded[index_no] = one_hot_encoder(value, max_value)
-        return np.array(encoded)
 
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error

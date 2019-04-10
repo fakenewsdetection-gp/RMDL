@@ -22,8 +22,11 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 import re
 from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+
 nltk.download("stopwords")
 cachedStopWords = stopwords.words("english")
+
 
 def transliterate(line):
     cedilla2latin = [[u'Á', u'A'], [u'á', u'a'], [u'Č', u'C'], [u'č', u'c'], [u'Š', u'S'], [u'š', u's']]
@@ -37,17 +40,7 @@ def transliterate(line):
     return new_line
 
 
-
-
-
-
-
-
-def text_cleaner(text,
-                 deep_clean=False,
-                 stem= True,
-                 stop_words=True,
-                 translite_rate=True):
+def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_rate=True):
     rules = [
         {r'>\s+': u'>'},  # remove spaces after a tag opens or closes
         {r'\s+': u' '},  # replace consecutive spaces
@@ -58,7 +51,6 @@ def text_cleaner(text,
         {r'<a\s+href="([^"]+)"[^>]*>.*</a>': r'\1'},  # show links instead of texts
         {r'[ \t]*<[^<]*?/?>': u''},  # remove remaining tags
         {r'^\s+': u''}  # remove spaces at the beginning
-
     ]
 
     if deep_clean:
