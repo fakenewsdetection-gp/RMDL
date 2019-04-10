@@ -267,7 +267,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             gc.collect()
         except:
             print("Error in model", i, "try to re-generate another model")
-                        traceback.print_tb(e.__traceback__)
+            traceback.print_tb(e.__traceback__)
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
             if max_nodes_rnn > 64:
