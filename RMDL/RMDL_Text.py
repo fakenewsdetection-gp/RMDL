@@ -29,8 +29,7 @@ from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
 from RMDL import Global as G
 from RMDL import Plot as Plot
-
-from sys import exit
+import sys
 
 def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
                         EMBEDDING_DIM=50,MAX_SEQUENCE_LENGTH = 500, MAX_NB_WORDS = 75000,
@@ -157,7 +156,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
 
         if not os.path.isfile(GloVe_DIR):
             print("Could not find %s Set GloVe Directory in Global.py ", GloVe)
-            exit()
+            sys.exit()
 
     G.setup()
     if random_deep[0] != 0:

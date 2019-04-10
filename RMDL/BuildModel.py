@@ -271,7 +271,7 @@ def Build_Model_RNN_Text(word_index, embeddings_index, nclasses,  MAX_SEQUENCE_L
                 print("could not broadcast input array from shape", str(len(embedding_matrix[i])),
                       "into shape", str(len(embedding_vector)), " Please make sure your"
                                                                 " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                exit(1)
+                sys.exit(1)
             embedding_matrix[i] = embedding_vector
     model.add(Embedding(len(word_index) + 1,
                                 EMBEDDING_DIM,
@@ -330,7 +330,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
                     print("could not broadcast input array from shape",str(len(embedding_matrix[i])),
                                      "into shape",str(len(embedding_vector))," Please make sure your"
                                      " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                    exit(1)
+                    sys.exit(1)
                 # words not found in embedding index will be all-zeros.
                 embedding_matrix[i] = embedding_vector
         model.add(Embedding(len(word_index) + 1,
@@ -376,7 +376,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
                     print("could not broadcast input array from shape",str(len(embedding_matrix[i])),
                                      "into shape",str(len(embedding_vector))," Please make sure your"
                                      " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                    exit(1)
+                    sys.exit(1)
 
                 embedding_matrix[i] = embedding_vector
 
