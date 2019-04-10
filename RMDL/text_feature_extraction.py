@@ -139,10 +139,12 @@ def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=
     if fit:
         vectorizer = TfidfVectorizer(max_features=max_num_words)
         text_tf_idf = vectorizer.fit_transform(text).toarray()
-        pickle.dump(vectorizer, open("tf_idf_vectorizer.pkl", "wb"))
+        with open("tf_idf_vectorizer.pkl", "wb") as tf_idf_vectorizer_file:
+            pickle.dump(vectorizer, tf_idf_vectorizer_file)
     else:
         if vectorizer_filepath is not None:
-            vectorizer = pickle.load(open(vectorizer_filepath, "rb"))
+            with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
+                vectorizer = pickle.load(tf_idf_vectorizer_file)
             text_tf_idf = vectorizer.transform(text).toarray()
         else:
             raise Exception("Pickle file for tf-idf vectorizer is not specified.")
