@@ -143,7 +143,7 @@ def loadData(X_train, X_test,MAX_NB_WORDS=75000):
     vectorizer_x = TfidfVectorizer(max_features=MAX_NB_WORDS)
     bias_lexicon = loadBiasLexicon('bias-lexicon.txt')
     X_train = vectorizer_x.fit_transform(X_train).toarray()
-    vocab = [] * len(vectorizer_x.vocabulary_)
+    vocab = {}
     for key, val in vectorizer_x.vocabulary_.items():
         vocab[val] = key
     X_train_bias = [[vec[i] if vocab[i] in bias_lexicon else 0 for i in range(len(vec))] for vec in X_train]
