@@ -19,6 +19,7 @@ import gc
 import os
 import numpy as np
 import collections
+import traceback
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
@@ -215,6 +216,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
         except Exception as e:
             print("Check the Error \n {} ".format(e))
             print("Error in model", i, "try to re-generate another model")
+            traceback.print_tb(e.__traceback__)
             if max_hidden_layer_dnn > 3:
                 max_hidden_layer_dnn -= 1
             if max_nodes_dnn > 256:
@@ -265,6 +267,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             gc.collect()
         except:
             print("Error in model", i, "try to re-generate another model")
+                        traceback.print_tb(e.__traceback__)
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
             if max_nodes_rnn > 64:
@@ -307,6 +310,7 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
             gc.collect()
         except:
             print("Error in model", i, "try to re-generate an other model")
+            traceback.print_tb(e.__traceback__)
             if max_hidden_layer_cnn > 5:
                 max_hidden_layer_cnn -= 1
             if max_nodes_cnn > 128:
