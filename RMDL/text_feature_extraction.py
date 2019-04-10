@@ -118,20 +118,21 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
     print(text.shape)
     X_train = text[0:len(X_train), ]
     X_test = text[len(X_train):, ]
-    embeddings_index = {}
-    f = open(GloVe_DIR, encoding="utf8")
-    for line in f:
+    return (X_train, X_test, word_index)
 
-        values = line.split()
-        word = values[0]
-        try:
-            coefs = np.asarray(values[1:], dtype='float32')
-        except:
-            pass
-        embeddings_index[word] = coefs
-    f.close()
-    print('Total %s word vectors.' % len(embeddings_index))
-    return (X_train, X_test, word_index,embeddings_index)
+
+def get_word_embeddings_index(glove_filepath):
+    embeddings_index = {}
+    with open(glove_filepath, encoding="utf8") as glove_file:
+        for line in glove_file:
+            values = line.split()
+            word = values[0]
+            try:
+                coefs = np.asarray(values[1:], dtype='float32')
+            except:
+                pass
+            embeddings_index[word] = coefs
+    return embeddings_index
 
 
 def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=None):
@@ -143,6 +144,7 @@ def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=
             pickle.dump(vectorizer, tf_idf_vectorizer_file)
     else:
         if vectorizer_filepath is not None:
+            vectorizer = None
             with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
                 vectorizer = pickle.load(tf_idf_vectorizer_file)
             text_tf_idf = vectorizer.transform(text).toarray()
