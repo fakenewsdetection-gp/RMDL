@@ -25,7 +25,6 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 import cpickle as pickle
 
 nltk.download("stopwords")
-cachedStopWords = stopwords.words("english")
 
 
 def transliterate(line):
@@ -102,7 +101,7 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
     return text.lower()
 
 
-def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM):
+def tokenize(X_train, X_test,MAX_NB_WORDS,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM):
     np.random.seed(7)
     text = np.concatenate((X_train, X_test), axis=0)
     text = np.array(text)
