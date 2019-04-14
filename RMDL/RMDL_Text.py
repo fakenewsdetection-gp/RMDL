@@ -437,3 +437,4 @@ def Text_Classification(x_train, y_train, x_test,  y_test, batch_size=128,
     print("F1_Micro:",F1)
     print("F1_Macro:",F2)
     print("F1_weighted:",F3)
+    return F_score

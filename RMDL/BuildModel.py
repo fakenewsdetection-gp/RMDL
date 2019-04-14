@@ -326,7 +326,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
         for word, i in word_index.items():
             embedding_vector = embeddings_index.get(word)
             if embedding_vector is not None:
-                if len(embedding_matrix[i]) !=len(embedding_vector):
+                if len(embedding_matrix[i]) != len(embedding_vector):
                     print("could not broadcast input array from shape",str(len(embedding_matrix[i])),
                                      "into shape",str(len(embedding_vector))," Please make sure your"
                                      " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
