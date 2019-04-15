@@ -44,7 +44,7 @@ def get_one_hot_values(labels):
 
 
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
-            embedding_dim=50, max_sequence_length=500, max_nb_words=75000,
+            embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
@@ -53,7 +53,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
     """
     train(x_train, y_train, x_val,  y_val, batch_size=128,
-            embedding_dim=50, max_sequence_length=500, max_nb_words=75000,
+            embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
@@ -65,11 +65,11 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
         ----------
             batch_size: int, optional
                 Number of samples per gradient update. If unspecified, it will default to 128
-            MAX_NB_WORDS: int, optional
+            max_num_words: int, optional
                 Maximum number of unique words in datasets, it will default to 75000.
-            GloVe_dir: string, optional
+            glove_dir: string, optional
                 Address of GloVe or any pre-trained directory, it will default to null which glove.6B.zip will be download.
-            GloVe_dir: string, optional
+            glove_file: string, optional
                 Which version of GloVe or pre-trained word emending will be used, it will default to glove.6B.50d.txt.
                 NOTE: if you use other version of GloVe EMBEDDING_DIM must be same dimensions.
             sparse_categorical: bool
@@ -133,22 +133,29 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     if glove_needed:
         if glove_dir == "":
             glove_dir = GloVe.download_and_extract()
-            glove_path = os.path.join(glove_dir, glove_file)
+            glove_filepath = os.path.join(glove_dir, glove_file)
         else:
-            glove_path = os.path.join(glove_dir, glove_file)
+            glove_filepath = os.path.join(glove_dir, glove_file)
 
-        if not os.path.isfile(glove_path):
+        if not os.path.isfile(glove_filepath):
             print("Could not find %s Set GloVe Directory in Global.py ", GloVe)
             exit()
 
     G.setup()
     if random_deep[0] != 0:
-        x_train_tfidf, x_val_tfidf = txt.loadData(x_train, x_val, MAX_NB_WORDS=max_nb_words)
+        x_train_tf_idf = txt.get_tf_idf_vectors(x_train, max_num_words=max_num_words)
+        x_val_tf_idf = txt.get_tf_idf_vectors(x_val, max_num_words=max_num_words,
+                                                fit=False,
+                                                vectorizer_filepath="./tf_idf_vectorizer.pkl")
     if random_deep[1] != 0 or random_deep[2] != 0 :
         print(glove_path)
-        x_train_embedded, x_val_embedded, word_index, embeddings_index = txt.loadData_Tokenizer(x_train, x_val,
-                                                                                                glove_path, max_nb_words,
-                                                                                                max_sequence_length, embedding_dim)
+        x_train_tokenized, word_index = tokenize(x_train, max_num_words=max_num_words,
+                                                    max_seq_len=max_seq_len)
+        x_val_tokenized, _ = tokenize(x_val, max_num_words=max_num_words,
+                                        max_seq_len=max_seq_len, fit=False,
+                                        tokenizer_filepath="./text_tokenizer.pkl")
+        embedding_index = get_word_embeddings_index(glove_filepath)
+        
     del x_train
     del x_val
     gc.collect()
@@ -174,20 +181,20 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='max')
-            model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tfidf.shape[1],
-                                                                number_of_classes,
-                                                                sparse_categorical,
-                                                                min_hidden_layer_dnn,
-                                                                max_hidden_layer_dnn,
-                                                                min_nodes_dnn,
-                                                                max_nodes_dnn,
-                                                                random_optimizor,
-                                                                dropout)
+            model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
+                                                            number_of_classes,
+                                                            sparse_categorical,
+                                                            min_hidden_layer_dnn,
+                                                            max_hidden_layer_dnn,
+                                                            min_nodes_dnn,
+                                                            max_nodes_dnn,
+                                                            random_optimizor,
+                                                            dropout)
             model_json = model_DNN.to_json()
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
-            model_history = model_DNN.fit(x_train_tfidf, y_train,
-                                            validation_data=(x_val_tfidf, y_val),
+            model_history = model_DNN.fit(x_train_tf_idf, y_train,
+                                            validation_data=(x_val_tf_idf, y_val),
                                             epochs=epochs[0],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
@@ -202,8 +209,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                 max_hidden_layer_dnn -= 1
             if max_nodes_dnn > 256:
                 max_nodes_dnn -= 8
-    del x_train_tfidf
-    del x_val_tfidf
+    del x_train_tf_idf
+    del x_val_tf_idf
     gc.collect()
 
     i=0
@@ -218,22 +225,22 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                             save_best_only=True,
                                             mode='max')
             model_RNN, _ = BuildModel.Build_Model_RNN_Text(word_index,
-                                                                embeddings_index,
-                                                                number_of_classes,
-                                                                max_sequence_length,
-                                                                embedding_dim,
-                                                                sparse_categorical,
-                                                                min_hidden_layer_rnn,
-                                                                max_hidden_layer_rnn,
-                                                                min_nodes_rnn,
-                                                                max_nodes_rnn,
-                                                                random_optimizor,
-                                                                dropout)
+                                                            embeddings_index,
+                                                            number_of_classes,
+                                                            max_seq_len,
+                                                            embedding_dim,
+                                                            sparse_categorical,
+                                                            min_hidden_layer_rnn,
+                                                            max_hidden_layer_rnn,
+                                                            min_nodes_rnn,
+                                                            max_nodes_rnn,
+                                                            random_optimizor,
+                                                            dropout)
             model_json = model_RNN.to_json()
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
-            model_history = model_RNN.fit(x_train_embedded, y_train,
-                                            validation_data=(x_val_embedded, y_val),
+            model_history = model_RNN.fit(x_train_tokenized, y_train,
+                                            validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[1],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
@@ -262,22 +269,22 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                             save_best_only=True,
                                             mode='max')
             model_CNN, _ = BuildModel.Build_Model_CNN_Text(word_index,
-                                                                embeddings_index,
-                                                                number_of_classes,
-                                                                max_sequence_length,
-                                                                embedding_dim,
-                                                                sparse_categorical,
-                                                                min_hidden_layer_cnn,
-                                                                max_hidden_layer_cnn,
-                                                                min_nodes_cnn,
-                                                                max_nodes_cnn,
-                                                                random_optimizor,
-                                                                dropout)
+                                                            embeddings_index,
+                                                            number_of_classes,
+                                                            max_seq_len,
+                                                            embedding_dim,
+                                                            sparse_categorical,
+                                                            min_hidden_layer_cnn,
+                                                            max_hidden_layer_cnn,
+                                                            min_nodes_cnn,
+                                                            max_nodes_cnn,
+                                                            random_optimizor,
+                                                            dropout)
             model_json = model_CNN.to_json()
             with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
                 model_json_file.write(model_json)
-            model_history = model_CNN.fit(x_train_embedded, y_train,
-                                            validation_data=(x_val_embedded, y_val),
+            model_history = model_CNN.fit(x_train_tokenized, y_train,
+                                            validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[2],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
