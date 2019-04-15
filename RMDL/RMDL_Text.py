@@ -154,7 +154,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
         x_val_tokenized, _ = txt.tokenize(x_val, max_num_words=max_num_words,
                                             max_seq_len=max_seq_len, fit=False,
                                             tokenizer_filepath="./text_tokenizer.pickle")
-        embedding_index = txt.get_word_embeddings_index(glove_filepath)
+        embeddings_index = txt.get_word_embeddings_index(glove_filepath)
 
     del x_train
     del x_val
