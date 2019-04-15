@@ -22,7 +22,7 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 import re
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-import cpickle as pickle
+import pickle
 
 nltk.download("stopwords")
 
