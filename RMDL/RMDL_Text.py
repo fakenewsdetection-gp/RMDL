@@ -150,10 +150,10 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     if random_deep[1] != 0 or random_deep[2] != 0 :
         print(glove_filepath)
         x_train_tokenized, word_index = txt.tokenize(x_train, max_num_words=max_num_words,
-                                                    max_seq_len=max_seq_len)
+                                                        max_seq_len=max_seq_len)
         x_val_tokenized, _ = txt.tokenize(x_val, max_num_words=max_num_words,
-                                        max_seq_len=max_seq_len, fit=False,
-                                        tokenizer_filepath="./text_tokenizer.pickle")
+                                            max_seq_len=max_seq_len, fit=False,
+                                            tokenizer_filepath="./text_tokenizer.pickle")
         embedding_index = txt.get_word_embeddings_index(glove_filepath)
 
     del x_train
@@ -173,7 +173,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[0]:
         try:
-            print("Building and Training DNN-%d", i)
+            print("Building and Training DNN-%d" % i)
             model_filepath = "DNN_" + str(i) + ".json"
             weights_filepath = "DNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
@@ -216,7 +216,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i=0
     while i < random_deep[1]:
         try:
-            print("Building and Training RNN-%d", i)
+            print("Building and Training RNN-%d" % i)
             model_filepath = "RNN_" + str(i) + ".json"
             weights_filepath = "RNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
@@ -250,6 +250,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_RNN
             gc.collect()
         except:
+            print("Check the Error \n {} ".format(e))
             print("Error in model", i, "try to re-generate another model")
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
@@ -260,7 +261,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[2]:
         try:
-            print("Building and Training CNN-%d", i)
+            print("Building and Training CNN-%d" % i)
             model_filepath = "CNN_" + str(i) + ".json"
             weights_filepath = "CNN_" + str(i) + ".hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
@@ -294,6 +295,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_CNN
             gc.collect()
         except:
+            print("Check the Error \n {} ".format(e))
             print("Error in model", i, "try to re-generate an other model")
             if max_hidden_layer_cnn > 5:
                 max_hidden_layer_cnn -= 1
