@@ -136,7 +136,6 @@ def get_word_embeddings_index(glove_filepath):
 
 
 def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=None):
-    text_tf_idf = None
     if fit:
         vectorizer = TfidfVectorizer(max_features=max_num_words)
         text_tf_idf = vectorizer.fit_transform(text).toarray()
