@@ -106,7 +106,7 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_fil
     if fit:
         tokenizer = Tokenizer(num_words=max_num_words)
         tokenizer.fit_on_texts(text)
-        with open("text_tokenizer.pkl", "wb") as text_tokenizer_file:
+        with open("text_tokenizer.pickle", "wb") as text_tokenizer_file:
             pickle.dump(tokenizer, text_tokenizer_file)
 
     else:
@@ -139,7 +139,7 @@ def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=
     if fit:
         vectorizer = TfidfVectorizer(max_features=max_num_words)
         text_tf_idf = vectorizer.fit_transform(text).toarray()
-        with open("tf_idf_vectorizer.pkl", "wb") as tf_idf_vectorizer_file:
+        with open("tf_idf_vectorizer.pickle", "wb") as tf_idf_vectorizer_file:
             pickle.dump(vectorizer, tf_idf_vectorizer_file)
     else:
         if vectorizer_filepath is not None:
