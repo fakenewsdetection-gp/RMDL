@@ -148,14 +148,14 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                 fit=False,
                                                 vectorizer_filepath="./tf_idf_vectorizer.pkl")
     if random_deep[1] != 0 or random_deep[2] != 0 :
-        print(glove_path)
+        print(glove_filepath)
         x_train_tokenized, word_index = tokenize(x_train, max_num_words=max_num_words,
                                                     max_seq_len=max_seq_len)
         x_val_tokenized, _ = tokenize(x_val, max_num_words=max_num_words,
                                         max_seq_len=max_seq_len, fit=False,
                                         tokenizer_filepath="./text_tokenizer.pkl")
         embedding_index = get_word_embeddings_index(glove_filepath)
-        
+
     del x_train
     del x_val
     gc.collect()
