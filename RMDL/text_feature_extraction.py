@@ -101,23 +101,24 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
     return text.lower()
 
 
-def tokenize(X_train, X_test,MAX_NB_WORDS,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM):
+def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_filepath=None):
     np.random.seed(7)
-    text = np.concatenate((X_train, X_test), axis=0)
-    text = np.array(text)
-    tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
-    tokenizer.fit_on_texts(text)
-    sequences = tokenizer.texts_to_sequences(text)
+    if fit:
+        tokenizer = Tokenizer(num_words=max_num_words)
+        tokenizer.fit_on_texts(text)
+        with open("text_tokenizer.pkl", "wb") as text_tokenizer_file:
+            pickle.dump(tokenizer, text_tokenizer_file)
+
+    else:
+        if tokenizer_filepath is not None:
+            with open(tokenizer_filepath, "rb") as text_tokenizer_file:
+                tokenizer = pickle.load(text_tokenizer_file)
+        else:
+            raise Exception("Pickle file for text tokenizer is not specified.")
     word_index = tokenizer.word_index
-    text = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
-    print('Found %s unique tokens.' % len(word_index))
-    indices = np.arange(text.shape[0])
-    # np.random.shuffle(indices)
-    text = text[indices]
-    print(text.shape)
-    X_train = text[0:len(X_train), ]
-    X_test = text[len(X_train):, ]
-    return (X_train, X_test, word_index)
+    sequences = tokenizer.texts_to_sequences(text)
+    text_tokenized = pad_sequences(sequences, maxlen=max_seq_len)
+    return text_tokenized, word_index
 
 
 def get_word_embeddings_index(glove_filepath):
