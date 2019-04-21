@@ -187,7 +187,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[0]:
         try:
-            print(f"Building and Training DNN-{i}")
+            print(f"\nBuilding and Training DNN-{i}")
             model_file = f"DNN_{i}.json"
             weights_file = f"DNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
@@ -232,7 +232,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[1]:
         try:
-            print(f"Building and Training RNN-{i}")
+            print(f"\nBuilding and Training RNN-{i}")
             model_file = f"RNN_{i}.json"
             weights_file = f"RNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
@@ -278,7 +278,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[2]:
         try:
-            print(f"Building and Training CNN-{i}")
+            print(f"\nBuilding and Training CNN-{i}")
             model_file = f"CNN_{i}.json"
             weights_file = f"CNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
@@ -386,21 +386,22 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
             try:
-                print(f"Evaluating {util.model_type[i]}-{j}")
+                print(f"\nEvaluating {util.model_type[i]}-{j}")
                 model_file = f"{util.model_type[i]}_{j}.json"
                 weights_file = f"{util.model_type[i]}_{j}.hdf5"
                 model_filepath = os.path.join(models_dir, model_file)
                 weights_filepath = os.path.join(weights_dir, weights_file)
-                if i == 1:
+                if i == 0:
                     x_test = x_test_tf_idf
                 else:
                     x_test = x_test_tokenized
-                y_pred, score = evaluate_model(x_test, y_test,
+                y_pred, acc_score = evaluate_model(x_test, y_test,
                                                 model_filepath, weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
+                print(f"Accuracy of {util.model_type[i]}-{j}: {acc_score}")
                 all_y_pred.append(y_pred)
-                scores.append(score)
+                scores.append(acc_score)
             except Exception as e:
                 print(f"Check the Error \n {e}")
                 print(f"Error in {util.model_type[j]}-{i} model trying to re-evaluate the model")
