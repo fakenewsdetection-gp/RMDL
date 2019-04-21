@@ -19,9 +19,8 @@ import gc
 import os
 import numpy as np
 import collections
-from sklearn.metrics import confusion_matrix
+
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import model_from_json
 from RMDL import BuildModel as BuildModel
@@ -29,6 +28,7 @@ from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
 from RMDL import global as g
 from RMDL import plot as plt
+from RMDL import score
 
 
 def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
@@ -91,7 +91,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                 Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNNs,
                 epochs[1] is number of epochs used in RNNs, epochs[0] is number of epochs used in CNNs. It will default to [500, 500, 500].
             plot: bool, optional
-                Plots accuracies, losses and confusion matrices(non-normalized and normalized).
+                Plot accuracies and losses of training and validation.
             min_hidden_layer_dnn: int, optional
                 Lower Bounds of hidden layers of DNN used in RMDL. It will default to 1.
             max_hidden_layer_dnn: int, optional
@@ -319,11 +319,11 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                 min_nodes_cnn -= 1
 
     if plot:
-        plt.RMDL_epoch(history)
+        plt.plot_history(history)
 
 
 def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
-                sparse_categorical=True, random_deep=[3, 3, 3], models_dir="models",
+                sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                 weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
@@ -344,6 +344,8 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
         random_deep: array of int [3], optional
             Number of ensembled models used in RMDL random_deep[0] is number of DNNs,
             random_deep[1] is number of RNNs, random_deep[2] is number of CNNs. It will default to [3, 3, 3].
+        plot: bool, optional
+            Plot confusion matrices(non-normalized and normalized).
         models_dir: string, optional
             Path to the directory where the pre-trained models are saved. It will default to "models".
         weights_dir: string, optional
@@ -355,7 +357,7 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
     """
 
     all_y_pred = []
-    all_score = []
+    scores = []
 
     if not isinstance(y_test[0], list) and not isinstance(y_test[0], np.ndarray) \
         and not sparse_categorical:
@@ -395,7 +397,7 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 all_y_pred.append(y_pred)
-                all_score.append(score)
+                scores.append(score)
             except Exception as e:
                 print(f"Check the Error \n {e}")
                 print(f"Error in {g.model_type[j]}-{i} model trying to re-evaluate the model")
@@ -411,3 +413,6 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
         sample_pred = np.array(y_probs[i, :])
         sample_pred = collections.Counter(sample_pred).most_common()[0][0]
         y_pred.append(sample_pred)
+
+    score.report_score(y_test, y_pred, scores, sparse_categorical=sparse_categorical, plot=plot)
+    return y_pred
