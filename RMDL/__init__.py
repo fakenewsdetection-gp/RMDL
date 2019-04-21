@@ -16,6 +16,7 @@ from __future__ import absolute_import
 
 from . import BuildModel
 from . import global
+from . import score
 from . import rmdl_text
 from . import rmdl_image
 from . import text_feature_extraction
