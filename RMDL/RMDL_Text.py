@@ -46,7 +46,7 @@ def get_one_hot_values(labels):
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
-            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
@@ -55,7 +55,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
-            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
@@ -64,46 +64,47 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
         Parameters
         ----------
             batch_size: int, optional
-                Number of samples per gradient update. If unspecified, it will default to 128
+                Number of samples per gradient update. If unspecified, It will default to 128.
             max_num_words: int, optional
-                Maximum number of unique words in datasets, it will default to 75000.
+                Maximum number of unique words in datasets. If unspecified, It will default to 75000.
             glove_dir: string, optional
-                Address of GloVe or any pre-trained directory, it will default to null which glove.6B.zip will be download.
+                Address of GloVe or any pre-trained word embedding directory, It will default to current
+                directory where glove.6B.zip should be downloaded.
             glove_file: string, optional
-                Which version of GloVe or pre-trained word emending will be used, it will default to glove.6B.50d.txt.
-                NOTE: if you use other version of GloVe EMBEDDING_DIM must be same dimensions.
+                Which version of GloVe or any pre-trained word embedding will be used, It will default to glove.6B.50d.txt.
+                NOTE: If you use other version of GloVe embedding_dim must be the same dimensions.
             sparse_categorical: bool
-                When target's dataset is (n,1) should be True, it will default to True.
+                When target's dataset is (n,1) should be True, It will default to True.
             random_deep: array of int [3], optional
-                Number of ensembled model used in RMDL random_deep[0] is number of DNN, random_deep[1] is number of RNN, random_deep[0] is number of CNN, it will default to [3, 3, 3].
+                Number of ensembled models used in RMDL random_deep[0] is number of DNNs,
+                random_deep[1] is number of RNNs, random_deep[0] is number of CNNs, It will default to [3, 3, 3].
             epochs: array of int [3], optional
-                Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNN, epochs[1] is number of epochs used in RNN, epochs[0] is number of epochs used in CNN, it will default to [500, 500, 500].
-            plot: bool, optional
-                True: shows confusion matrix and accuracy and loss
+                Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNNs,
+                epochs[1] is number of epochs used in RNNs, epochs[0] is number of epochs used in CNNs, It will default to [500, 500, 500].
             min_hidden_layer_dnn: int, optional
-                Lower Bounds of hidden layers of DNN used in RMDL, it will default to 1.
+                Lower Bounds of hidden layers of DNN used in RMDL, It will default to 1.
             max_hidden_layer_dnn: int, optional
-                Upper bounds of hidden layers of DNN used in RMDL, it will default to 8.
+                Upper bounds of hidden layers of DNN used in RMDL, It will default to 8.
             min_nodes_dnn: int, optional
-                Lower bounds of nodes in each layer of DNN used in RMDL, it will default to 128.
+                Lower bounds of nodes in each layer of DNN used in RMDL, It will default to 128.
             max_nodes_dnn: int, optional
-                Upper bounds of nodes in each layer of DNN used in RMDL, it will default to 1024.
+                Upper bounds of nodes in each layer of DNN used in RMDL, It will default to 1024.
             min_hidden_layer_rnn: int, optional
-                Lower Bounds of hidden layers of RNN used in RMDL, it will default to 1.
+                Lower Bounds of hidden layers of RNN used in RMDL, It will default to 1.
             min_hidden_layer_rnn: int, optional
-                Upper Bounds of hidden layers of RNN used in RMDL, it will default to 5.
+                Upper Bounds of hidden layers of RNN used in RMDL, It will default to 5.
             min_nodes_rnn: int, optional
-                Lower bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, it will default to 32.
+                Lower bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, It will default to 32.
             max_nodes_rnn: int, optional
-                Upper bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, it will default to 128.
+                Upper bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, It will default to 128.
             min_hidden_layer_cnn: int, optional
-                Lower Bounds of hidden layers of CNN used in RMDL, it will default to 3.
+                Lower Bounds of hidden layers of CNN used in RMDL, It will default to 3.
             max_hidden_layer_cnn: int, optional
-                Upper Bounds of hidden layers of CNN used in RMDL, it will default to 10.
+                Upper Bounds of hidden layers of CNN used in RMDL, It will default to 10.
             min_nodes_cnn: int, optional
-                Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 128.
+                Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, It will default to 128.
             min_nodes_cnn: int, optional
-                Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, it will default to 512.
+                Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, It will default to 512.
             random_state: int, optional
                 RandomState instance or None, optional (default=None)
                 If Integer, random_state is the seed used by the random number generator;
