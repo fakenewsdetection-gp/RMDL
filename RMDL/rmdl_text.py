@@ -324,14 +324,15 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
         plt.plot_history(history)
 
 
-def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
-                sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
-                weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
-                text_tokenizer_filepath="text_tokenizer.pickle"):
+def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+                        sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
+                        weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                        text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
-                    sparse_categorical=True, random_deep=[3, 3, 3], models_dir="models",
-                    weights_dir="weights")
+    predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+                        sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
+                        weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                        text_tokenizer_filepath="text_tokenizer.pickle")
 
     Parameters
     ----------
