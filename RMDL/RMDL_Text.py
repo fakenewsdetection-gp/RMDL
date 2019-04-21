@@ -23,6 +23,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
+from keras.models import model_from_json
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
@@ -30,17 +31,20 @@ from RMDL import Global as G
 from RMDL import Plot as Plot
 
 
-def one_hot_encoder(value, label):
-    label[value] = 1
-    return label
-
-
-def get_one_hot_values(labels):
-    encoded = [0] * len(labels)
-    for index_no, value in enumerate(labels):
-        max_value = [0] * (np.max(labels) + 1)
-        encoded[index_no] = one_hot_encoder(value, max_value)
-    return np.array(encoded)
+def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
+                    batch_size=128, sparse_categorical=True):
+    with open(model_filepath, "r") as model_file:
+        model = model_from_json(model_file.read())
+    model.load_weights(weights_filepath)
+    if sparse_categorical:
+        y_pred = model.predict_classes(x_test, batch_size=batch_size)
+        y_pred = np.array(y_pred)
+        score = accuracy_score(y_test, y_pred)
+    else:
+        y_pred = model.predict(x_test, batch_size=batch_size)
+        y_pred = np.argmax(y_pred, axis=1)
+        score = accuracy_score(np.argmax(y_test, axis=1), y_pred)
+    return y_pred, score
 
 
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
@@ -59,57 +63,62 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
+            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0)
 
         Parameters
         ----------
             batch_size: int, optional
-                Number of samples per gradient update. If unspecified, It will default to 128.
+                Number of samples per gradient update. It will default to 128.
+            embedding_dim: int, optional
+                Dimensionality of the vector representation (word embedding) of each token in the corpus.
+                It will default to 50.
+            max_seq_len: int, optional
+                Maximum number of words in a text to consider. It will default to 500.
             max_num_words: int, optional
-                Maximum number of unique words in datasets. If unspecified, It will default to 75000.
+                Maximum number of unique words in datasets. It will default to 75000.
             glove_dir: string, optional
-                Address of GloVe or any pre-trained word embedding directory, It will default to current
+                Path to GloVe or any pre-trained word embedding directory. It will default to the current
                 directory where glove.6B.zip should be downloaded.
             glove_file: string, optional
-                Which version of GloVe or any pre-trained word embedding will be used, It will default to glove.6B.50d.txt.
+                Which version of GloVe or any pre-trained word embedding will be used. It will default to glove.6B.50d.txt.
                 NOTE: If you use other version of GloVe embedding_dim must be the same dimensions.
             sparse_categorical: bool
-                When target's dataset is (n,1) should be True, It will default to True.
+                When target's dataset is (n,1) should be True. It will default to True.
             random_deep: array of int [3], optional
                 Number of ensembled models used in RMDL random_deep[0] is number of DNNs,
-                random_deep[1] is number of RNNs, random_deep[0] is number of CNNs, It will default to [3, 3, 3].
+                random_deep[1] is number of RNNs, random_deep[2] is number of CNNs. It will default to [3, 3, 3].
             epochs: array of int [3], optional
                 Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNNs,
-                epochs[1] is number of epochs used in RNNs, epochs[0] is number of epochs used in CNNs, It will default to [500, 500, 500].
+                epochs[1] is number of epochs used in RNNs, epochs[0] is number of epochs used in CNNs. It will default to [500, 500, 500].
             min_hidden_layer_dnn: int, optional
-                Lower Bounds of hidden layers of DNN used in RMDL, It will default to 1.
+                Lower Bounds of hidden layers of DNN used in RMDL. It will default to 1.
             max_hidden_layer_dnn: int, optional
-                Upper bounds of hidden layers of DNN used in RMDL, It will default to 8.
+                Upper bounds of hidden layers of DNN used in RMDL. It will default to 8.
             min_nodes_dnn: int, optional
-                Lower bounds of nodes in each layer of DNN used in RMDL, It will default to 128.
+                Lower bounds of nodes in each layer of DNN used in RMDL. It will default to 128.
             max_nodes_dnn: int, optional
-                Upper bounds of nodes in each layer of DNN used in RMDL, It will default to 1024.
+                Upper bounds of nodes in each layer of DNN used in RMDL. It will default to 1024.
             min_hidden_layer_rnn: int, optional
-                Lower Bounds of hidden layers of RNN used in RMDL, It will default to 1.
+                Lower Bounds of hidden layers of RNN used in RMDL. It will default to 1.
             min_hidden_layer_rnn: int, optional
-                Upper Bounds of hidden layers of RNN used in RMDL, It will default to 5.
+                Upper Bounds of hidden layers of RNN used in RMDL. It will default to 5.
             min_nodes_rnn: int, optional
-                Lower bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, It will default to 32.
+                Lower bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL. It will default to 32.
             max_nodes_rnn: int, optional
-                Upper bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL, It will default to 128.
+                Upper bounds of nodes (LSTM or GRU) in each layer of RNN used in RMDL. It will default to 128.
             min_hidden_layer_cnn: int, optional
-                Lower Bounds of hidden layers of CNN used in RMDL, It will default to 3.
+                Lower Bounds of hidden layers of CNN used in RMDL. It will default to 3.
             max_hidden_layer_cnn: int, optional
-                Upper Bounds of hidden layers of CNN used in RMDL, It will default to 10.
+                Upper Bounds of hidden layers of CNN used in RMDL. It will default to 10.
             min_nodes_cnn: int, optional
-                Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, It will default to 128.
+                Lower bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL. It will default to 128.
             min_nodes_cnn: int, optional
-                Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL, It will default to 512.
+                Upper bounds of nodes (2D convolution layer) in each layer of CNN used in RMDL. It will default to 512.
             random_state: int, optional
                 RandomState instance or None, optional (default=None)
                 If Integer, random_state is the seed used by the random number generator;
             random_optimizor: bool, optional
-                If False, all models use adam optimizer. If True, all models use random optimizers. it will default to True
+                If False, all models use adam optimizer. If True, all models use random optimizers. It will default to True
             dropout: float, optional
                 between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs.
             no_of_classes: int, optional
@@ -120,17 +129,18 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
 
     models_dir = "models"
     weights_dir = "weights"
+    G.setup()
 
     history = []
 
-    glove_needed = random_deep[1] != 0 or random_deep[2] != 0
-
-    if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) and not sparse_categorical:
+    if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) \
+        and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error
-        print("converted_into_one_hot")
-        y_train = get_one_hot_values(y_train)
-        y_val = get_one_hot_values(y_val)
+        print("convert labels into one hot encoded representation")
+        y_train = txt.get_one_hot_values(y_train)
+        y_val = txt.get_one_hot_values(y_val)
 
+    glove_needed = random_deep[1] != 0 or random_deep[2] != 0
     if glove_needed:
         if glove_dir == "":
             glove_dir = GloVe.download_and_extract()
@@ -139,20 +149,19 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             glove_filepath = os.path.join(glove_dir, glove_file)
 
         if not os.path.isfile(glove_filepath):
-            print("Could not find %s Set GloVe Directory in Global.py ", GloVe)
+            print(f"Could not find {GloVe} Set GloVe Directory in Global.py")
             exit()
-
-    G.setup()
 
     all_text = np.concatenate((x_train, x_val))
     if random_deep[0] != 0:
         all_text_tf_idf = txt.get_tf_idf_vectors(all_text, max_num_words=max_num_words)
         x_train_tf_idf = all_text_tf_idf[:len(x_train), ]
         x_val_tf_idf = all_text_tf_idf[len(x_train):, ]
-    if random_deep[1] != 0 or random_deep[2] != 0 :
+    if random_deep[1] != 0 or random_deep[2] != 0:
         print(glove_filepath)
-        all_text_tokenized, word_index = txt.tokenize(all_text, max_num_words=max_num_words,
-                                                    max_seq_len=max_seq_len)
+        all_text_tokenized, word_index = txt.tokenize(all_text,
+                                                        max_num_words=max_num_words,
+                                                        max_seq_len=max_seq_len)
         x_train_tokenized = all_text_tokenized[:len(x_train), ]
         x_val_tokenized = all_text_tokenized[len(x_train):, ]
         embeddings_index = txt.get_word_embeddings_index(glove_filepath)
@@ -174,10 +183,10 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     i = 0
     while i < random_deep[0]:
         try:
-            print("Building and Training DNN-%d" % i)
-            model_filepath = "DNN_" + str(i) + ".json"
-            weights_filepath = "DNN_" + str(i) + ".hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
+            print(f"Building and Training DNN-{i}")
+            model_file = f"DNN_{i}.json"
+            weights_file = f"DNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
                                             monitor='val_acc',
                                             verbose=1,
                                             save_best_only=True,
@@ -192,8 +201,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             random_optimizor,
                                                             dropout)
             model_json = model_DNN.to_json()
-            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
-                model_json_file.write(model_json)
+            with open(os.path.join(models_dir, model_file), "w") as model_DNN_file:
+                model_DNN_file.write(model_json)
             model_history = model_DNN.fit(x_train_tf_idf, y_train,
                                             validation_data=(x_val_tf_idf, y_val),
                                             epochs=epochs[0],
@@ -203,24 +212,26 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             history.append(model_history)
             i += 1
             del model_DNN
+            gc.collect()
         except Exception as e:
-            print("Check the Error \n {} ".format(e))
-            print("Error in model", i, "try to re-generate another model")
+            print(f"Check the Error \n {e}")
+            print(f"Error in DNN-{i} model trying to re-generate another model")
             if max_hidden_layer_dnn > 3:
                 max_hidden_layer_dnn -= 1
             if max_nodes_dnn > 256:
                 max_nodes_dnn -= 8
+
     del x_train_tf_idf
     del x_val_tf_idf
     gc.collect()
 
-    i=0
+    i = 0
     while i < random_deep[1]:
         try:
-            print("Building and Training RNN-%d" % i)
-            model_filepath = "RNN_" + str(i) + ".json"
-            weights_filepath = "RNN_" + str(i) + ".hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
+            print(f"Building and Training RNN-{i}")
+            model_file = f"RNN_{i}.json"
+            weights_file = f"RNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
                                             monitor='val_acc',
                                             verbose=1,
                                             save_best_only=True,
@@ -238,8 +249,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             random_optimizor,
                                                             dropout)
             model_json = model_RNN.to_json()
-            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
-                model_json_file.write(model_json)
+            with open(os.path.join(models_dir, model_file), "w") as model_RNN_file:
+                model_RNN_file.write(model_json)
             model_history = model_RNN.fit(x_train_tokenized, y_train,
                                             validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[1],
@@ -251,21 +262,22 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_RNN
             gc.collect()
         except:
-            print("Check the Error \n {} ".format(e))
-            print("Error in model", i, "try to re-generate another model")
+            print(f"Check the Error \n {e}")
+            print(f"Error in RNN-{i} model trying to re-generate another model")
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
             if max_nodes_rnn > 64:
                 max_nodes_rnn -= 2
+
     gc.collect()
 
     i = 0
     while i < random_deep[2]:
         try:
-            print("Building and Training CNN-%d" % i)
-            model_filepath = "CNN_" + str(i) + ".json"
-            weights_filepath = "CNN_" + str(i) + ".hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_filepath),
+            print(f"Building and Training CNN-{i}")
+            model_file = f"CNN_{i}.json"
+            weights_file = f"CNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
                                             monitor='val_acc',
                                             verbose=1,
                                             save_best_only=True,
@@ -283,8 +295,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             random_optimizor,
                                                             dropout)
             model_json = model_CNN.to_json()
-            with open(os.path.join(models_dir, model_filepath), "w") as model_json_file:
-                model_json_file.write(model_json)
+            with open(os.path.join(models_dir, model_file), "w") as model_CNN_file:
+                model_CNN_file.write(model_json)
             model_history = model_CNN.fit(x_train_tokenized, y_train,
                                             validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[2],
@@ -296,10 +308,96 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_CNN
             gc.collect()
         except:
-            print("Check the Error \n {} ".format(e))
-            print("Error in model", i, "try to re-generate an other model")
+            print(f"Check the Error \n {e}")
+            print(f"Error in CNN-{i} model trying to re-generate another model")
             if max_hidden_layer_cnn > 5:
                 max_hidden_layer_cnn -= 1
             if max_nodes_cnn > 128:
                 max_nodes_cnn -= 2
                 min_nodes_cnn -= 1
+
+
+def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+                sparse_categorical=True, random_deep=[3, 3, 3], models_dir="models",
+                weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                text_tokenizer_filepath="text_tokenizer.pickle"):
+    """
+    evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+                    sparse_categorical=True, random_deep=[3, 3, 3], models_dir="models",
+                    weights_dir="weights")
+
+    Parameters
+    ----------
+        batch_size: int, optional
+            Number of samples per gradient update. It will default to 128.
+        max_seq_len: int, optional
+            Maximum number of words in a text to consider. It will default to 500.
+        max_num_words: int, optional
+            Maximum number of unique words in datasets. It will default to 75000.
+        sparse_categorical: bool
+            When target's dataset is (n,1) should be True. It will default to True.
+        random_deep: array of int [3], optional
+            Number of ensembled models used in RMDL random_deep[0] is number of DNNs,
+            random_deep[1] is number of RNNs, random_deep[2] is number of CNNs. It will default to [3, 3, 3].
+        models_dir: string, optional
+            Path to the directory where the pre-trained models are saved. It will default to "models".
+        weights_dir: string, optional
+            Path to the directory where the weights of the pre-trained models are saved. It will default to "weights".
+        tf_idf_vectorizer_filepath: string, optional
+            Path to tf-idf vectorizer used in preprocessing while training RMDL. It will default to "tf_idf_vectorizer.pickle".
+        text_tokenizer_filepath: string, optional
+            Path to text tokenizer used in preprocessing while training RMDL. It will default to "text_tokenizer.pickle".
+    """
+
+    all_y_pred = []
+    all_score = []
+
+    model_type = {0: "DNN", 1: "RNN", 2: "CNN"}
+
+    if not isinstance(y_test[0], list) and not isinstance(y_test[0], np.ndarray) \
+        and not sparse_categorical:
+        #checking if labels are one hot or not otherwise dense_layer will give shape error
+        print("convert labels into one hot encoded representation")
+        y_test = txt.get_one_hot_values(y_test)
+
+    if random_deep[0] != 0:
+        x_test_tf_idf = txt.get_tf_idf_vectors(x_test,
+                                                max_num_words=max_num_words,
+                                                fit=False,
+                                                vectorizer_filepath=tf_idf_vectorizer_filepath)
+    if random_deep[1] != 0 or random_deep[2] != 0:
+        x_test_tokenized, _ = txt.tokenize(x_test,
+                                            max_num_words=max_num_words,
+                                            max_seq_len=max_seq_len,
+                                            fit=False,
+                                            tokenizer_filepath=text_tokenizer_filepath)
+
+    del x_test
+    gc.collect()
+
+    for i in range(len(random_deep)):
+        for j in range(random_deep[i]):
+            try:
+                print(f"Evaluating {model_type[i]}-{j}")
+                model_file = f"{model_type[i]}_{j}.json"
+                weights_file = f"{model_type[i]}_{j}.hdf5"
+                model_filepath = os.path.join(models_dir, model_file)
+                weights_filepath = os.path.join(weights_dir, weights_file)
+                if i == 1:
+                    x_test = x_test_tf_idf
+                else:
+                    x_test = x_test_tokenized
+                y_pred, score = evaluate_model(x_test, y_test,
+                                                model_filepath, weights_filepath,
+                                                batch_size=batch_size,
+                                                sparse_categorical=sparse_categorical)
+                all_y_pred.append(y_pred)
+                all_score.append(score)
+            except Exception as e:
+                print(f"Check the Error \n {e}")
+                print(f"Error in {model_type[j]}-{i} model trying to re-evaluate the model")
+
+    del x_test
+    del x_test_tf_idf
+    del x_test_tokenized
+    gc.collect()
