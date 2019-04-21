@@ -17,6 +17,8 @@ RMDL: Random Multimodel Deep Learning for Classification
 import numpy as np
 import os
 
+model_type = {0: "DNN", 1: "RNN", 2: "CNN"}
+
 def setup():
     np.set_printoptions(threshold=np.inf)
     np.random.seed(7)

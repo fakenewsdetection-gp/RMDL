@@ -16,13 +16,13 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from sklearn.metrics import accuracy_score
 import numpy as np
-from RMDL import Plot as Plot
+from RMDL import plot as plt
 import gc
 from sklearn.metrics import confusion_matrix
 import collections
 from sklearn.metrics import f1_score
 from RMDL import BuildModel as BuildModel
-from RMDL import Global as G
+from RMDL import global as g
 from keras.callbacks import ModelCheckpoint
 np.random.seed(7)
 
@@ -117,7 +117,7 @@ def Image_Classification(x_train, y_train, x_test, y_test, shape, batch_size=128
                          str(len(y_test)))
 
     np.random.seed(random_state)
-    G.setup()
+    g.setup()
     y_proba = []
 
     score = []
@@ -295,15 +295,15 @@ def Image_Classification(x_train, y_train, x_test, y_test, shape, batch_size=128
     # Compute confusion matrix
     np.set_printoptions(precision=2)
     if plot:
-        # Plot non-normalized confusion matrix
+        # plt non-normalized confusion matrix
         classes = list(range(0,np.max(y_test)+1))
-        Plot.plot_confusion_matrix(cnf_matrix, classes=classes,
+        plt.plot_confusion_matrix(cnf_matrix, classes=classes,
                          title='Confusion matrix, without normalization')
-        Plot.plot_confusion_matrix(cnf_matrix, classes=classes,normalize=True,
+        plt.plot_confusion_matrix(cnf_matrix, classes=classes,normalize=True,
                               title='Confusion matrix, without normalization')
 
     if plot:
-        Plot.RMDL_epoch(history_)
+        plt.plot_history(history_)
 
     print(y_proba.shape)
     print("Accuracy of",len(score),"models:",score)

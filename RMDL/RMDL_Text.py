@@ -27,8 +27,8 @@ from keras.models import model_from_json
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
-from RMDL import Global as G
-from RMDL import Plot as Plot
+from RMDL import global as g
+from RMDL import plot as plt
 
 
 def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
@@ -50,7 +50,7 @@ def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
-            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
@@ -59,7 +59,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
-            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500],
+            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
@@ -90,6 +90,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             epochs: array of int [3], optional
                 Number of epochs in each ensembled model used in RMDL epochs[0] is number of epochs used in DNNs,
                 epochs[1] is number of epochs used in RNNs, epochs[0] is number of epochs used in CNNs. It will default to [500, 500, 500].
+            plot: bool, optional
+                Plots accuracies, losses and confusion matrices(non-normalized and normalized).
             min_hidden_layer_dnn: int, optional
                 Lower Bounds of hidden layers of DNN used in RMDL. It will default to 1.
             max_hidden_layer_dnn: int, optional
@@ -129,7 +131,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
 
     models_dir = "models"
     weights_dir = "weights"
-    G.setup()
+    g.setup()
 
     history = []
 
@@ -316,6 +318,9 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                 max_nodes_cnn -= 2
                 min_nodes_cnn -= 1
 
+    if plot:
+        plt.RMDL_epoch(history)
+
 
 def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3], models_dir="models",
@@ -352,8 +357,6 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
     all_y_pred = []
     all_score = []
 
-    model_type = {0: "DNN", 1: "RNN", 2: "CNN"}
-
     if not isinstance(y_test[0], list) and not isinstance(y_test[0], np.ndarray) \
         and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error
@@ -378,9 +381,9 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
             try:
-                print(f"Evaluating {model_type[i]}-{j}")
-                model_file = f"{model_type[i]}_{j}.json"
-                weights_file = f"{model_type[i]}_{j}.hdf5"
+                print(f"Evaluating {g.model_type[i]}-{j}")
+                model_file = f"{g.model_type[i]}_{j}.json"
+                weights_file = f"{g.model_type[i]}_{j}.hdf5"
                 model_filepath = os.path.join(models_dir, model_file)
                 weights_filepath = os.path.join(weights_dir, weights_file)
                 if i == 1:
@@ -395,9 +398,16 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                 all_score.append(score)
             except Exception as e:
                 print(f"Check the Error \n {e}")
-                print(f"Error in {model_type[j]}-{i} model trying to re-evaluate the model")
+                print(f"Error in {g.model_type[j]}-{i} model trying to re-evaluate the model")
 
     del x_test
     del x_test_tf_idf
     del x_test_tokenized
     gc.collect()
+
+    y_probs = np.array(all_y_pred).transpose()
+    y_pred = []
+    for i in range(y_probs.shape[0]):
+        sample_pred = np.array(y_probs[i, :])
+        sample_pred = collections.Counter(sample_pred).most_common()[0][0]
+        y_pred.append(sample_pred)
