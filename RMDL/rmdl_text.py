@@ -26,7 +26,7 @@ from keras.models import model_from_json
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
-from RMDL import global as g
+from RMDL import util
 from RMDL import plot as plt
 from RMDL import score
 
@@ -36,7 +36,7 @@ def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
     with open(model_filepath, "r") as model_file:
         model = model_from_json(model_file.read())
     model.load_weights(weights_filepath)
-    
+
     if sparse_categorical:
         y_pred = model.predict_classes(x_test, batch_size=batch_size)
         y_pred = np.array(y_pred)
@@ -132,7 +132,8 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
 
     models_dir = "models"
     weights_dir = "weights"
-    g.setup()
+
+    util.setup()
 
     history = []
 
@@ -384,9 +385,9 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
             try:
-                print(f"Evaluating {g.model_type[i]}-{j}")
-                model_file = f"{g.model_type[i]}_{j}.json"
-                weights_file = f"{g.model_type[i]}_{j}.hdf5"
+                print(f"Evaluating {util.model_type[i]}-{j}")
+                model_file = f"{util.model_type[i]}_{j}.json"
+                weights_file = f"{util.model_type[i]}_{j}.hdf5"
                 model_filepath = os.path.join(models_dir, model_file)
                 weights_filepath = os.path.join(weights_dir, weights_file)
                 if i == 1:
@@ -401,7 +402,7 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                 scores.append(score)
             except Exception as e:
                 print(f"Check the Error \n {e}")
-                print(f"Error in {g.model_type[j]}-{i} model trying to re-evaluate the model")
+                print(f"Error in {util.model_type[j]}-{i} model trying to re-evaluate the model")
 
     del x_test
     del x_test_tf_idf

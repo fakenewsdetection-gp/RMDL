@@ -22,7 +22,7 @@ from sklearn.metrics import confusion_matrix
 import collections
 from sklearn.metrics import f1_score
 from RMDL import BuildModel as BuildModel
-from RMDL import global as g
+from RMDL import util
 from keras.callbacks import ModelCheckpoint
 np.random.seed(7)
 
@@ -117,7 +117,7 @@ def Image_Classification(x_train, y_train, x_test, y_test, shape, batch_size=128
                          str(len(y_test)))
 
     np.random.seed(random_state)
-    g.setup()
+    util.setup()
     y_proba = []
 
     score = []
