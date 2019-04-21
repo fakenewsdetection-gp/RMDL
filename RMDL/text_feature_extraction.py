@@ -52,10 +52,13 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
         {r'>\s+': u'>'},  # remove spaces after a tag opens or closes
         {r'\s+': u' '},  # replace consecutive spaces
         {r'\s*<br\s*/?>\s*': u'\n'},  # newline after a <br>
-        {r'</(div)\s*>\s*': u'\n'},  # newline after </p> and </div> and <h1/>...
-        {r'</(p|h\d)\s*>\s*': u'\n\n'},  # newline after </p> and </div> and <h1/>...
+        # newline after </p> and </div> and <h1/>...
+        {r'</(div)\s*>\s*': u'\n'},
+        # newline after </p> and </div> and <h1/>...
+        {r'</(p|h\d)\s*>\s*': u'\n\n'},
         {r'<head>.*<\s*(/head|body)[^>]*>': u''},  # remove <head> to </head>
-        {r'<a\s+href="([^"]+)"[^>]*>.*</a>': r'\1'},  # show links instead of texts
+        # show links instead of texts
+        {r'<a\s+href="([^"]+)"[^>]*>.*</a>': r'\1'},
         {r'[ \t]*<[^<]*?/?>': u''},  # remove remaining tags
         {r'^\s+': u''}  # remove spaces at the beginning
     ]
@@ -79,7 +82,8 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
                 text = regex.sub(v, text)
             text = text.rstrip()
             text = text.strip()
-        text = text.replace('+', ' ').replace('.', ' ').replace(',', ' ').replace(':', ' ')
+        text = text.replace('+', ' ').replace('.',
+                                              ' ').replace(',', ' ').replace(':', ' ')
         text = re.sub("(^|\W)\d+($|\W)", " ", text)
         if translite_rate:
             text = transliterate(text)
@@ -101,6 +105,15 @@ def text_cleaner(text, deep_clean=False, stem=True, stop_words=True, translite_r
     return text.lower()
 
 
+def get_one_hot_values(labels):
+    encoded = [0] * len(labels)
+    for index_no, value in enumerate(labels):
+        max_value = [0] * (np.max(labels) + 1)
+        max_value[value] = 1
+        encoded[index_no] = max_value
+    return np.array(encoded)
+
+
 def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_filepath=None):
     np.random.seed(7)
     if fit:
@@ -108,7 +121,6 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_fil
         tokenizer.fit_on_texts(text)
         with open("text_tokenizer.pickle", "wb") as text_tokenizer_file:
             pickle.dump(tokenizer, text_tokenizer_file)
-
     else:
         if tokenizer_filepath is not None:
             with open(tokenizer_filepath, "rb") as text_tokenizer_file:
