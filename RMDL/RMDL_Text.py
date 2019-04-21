@@ -36,6 +36,7 @@ def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
     with open(model_filepath, "r") as model_file:
         model = model_from_json(model_file.read())
     model.load_weights(weights_filepath)
+    
     if sparse_categorical:
         y_pred = model.predict_classes(x_test, batch_size=batch_size)
         y_pred = np.array(y_pred)
