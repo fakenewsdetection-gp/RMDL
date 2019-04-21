@@ -15,10 +15,10 @@ RMDL: Random Multimodel Deep Learning for Classification
 from __future__ import absolute_import
 
 from . import BuildModel
-from . import Global
-from . import RMDL_Text
-from . import RMDL_Image
+from . import global
+from . import rmdl_text
+from . import rmdl_image
 from . import text_feature_extraction
-from . import Plot
+from . import plot
 
 __version__ = '1.0.3'
