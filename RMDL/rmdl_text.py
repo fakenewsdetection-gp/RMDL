@@ -40,12 +40,12 @@ def evaluate_model(x_test, y_test, model_filepath, weights_filepath,
     if sparse_categorical:
         y_pred = model.predict_classes(x_test, batch_size=batch_size)
         y_pred = np.array(y_pred)
-        score = accuracy_score(y_test, y_pred)
+        acc_score = accuracy_score(y_test, y_pred)
     else:
         y_pred = model.predict(x_test, batch_size=batch_size)
         y_pred = np.argmax(y_pred, axis=1)
-        score = accuracy_score(np.argmax(y_test, axis=1), y_pred)
-    return y_pred, score
+        acc_score = accuracy_score(np.argmax(y_test, axis=1), y_pred)
+    return y_pred, acc_score
 
 
 def train(x_train, y_train, x_val,  y_val, batch_size=128,
@@ -396,9 +396,9 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
                 else:
                     x_test = x_test_tokenized
                 y_pred, accuracy = evaluate_model(x_test, y_test,
-                                                model_filepath, weights_filepath,
-                                                batch_size=batch_size,
-                                                sparse_categorical=sparse_categorical)
+                                                    model_filepath, weights_filepath,
+                                                    batch_size=batch_size,
+                                                    sparse_categorical=sparse_categorical)
                 print(f"Accuracy of {util.model_type[i]}-{j}: {accuracy}")
                 all_y_pred.append(y_pred)
                 accuracies.append(accuracy)
