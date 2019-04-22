@@ -399,7 +399,7 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
                                                 model_filepath, weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
-                print(f"Accuracy of {util.model_type[i]}-{j}: {acc_score}")
+                print(f"Accuracy of {util.model_type[i]}-{j}: {accuracy}")
                 all_y_pred.append(y_pred)
                 accuracies.append(accuracy)
             except Exception as e:
