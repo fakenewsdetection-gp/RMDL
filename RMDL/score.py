@@ -1,7 +1,9 @@
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+import numpy as np
 from RMDL import plot as plt
+
 
 def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False):
     if not sparse_categorical:
