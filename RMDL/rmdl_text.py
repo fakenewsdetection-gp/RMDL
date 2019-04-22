@@ -403,8 +403,8 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
                 all_y_pred.append(y_pred)
                 accuracies.append(accuracy)
             except Exception as e:
+                print(f"Error in {util.model_type[i]}-{j}\n")
                 print(f"Check the Error \n {e}")
-                print(f"Error in {util.model_type[j]}-{i} model trying to re-evaluate the model")
 
     del x_test
     del x_test_tf_idf
