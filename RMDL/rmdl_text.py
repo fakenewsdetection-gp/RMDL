@@ -360,7 +360,7 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
     """
 
     all_y_pred = []
-    scores = []
+    accuracies = []
 
     if not isinstance(y_test[0], list) and not isinstance(y_test[0], np.ndarray) \
         and not sparse_categorical:
@@ -395,13 +395,13 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
                     x_test = x_test_tf_idf
                 else:
                     x_test = x_test_tokenized
-                y_pred, acc_score = evaluate_model(x_test, y_test,
+                y_pred, accuracy = evaluate_model(x_test, y_test,
                                                 model_filepath, weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 print(f"Accuracy of {util.model_type[i]}-{j}: {acc_score}")
                 all_y_pred.append(y_pred)
-                scores.append(acc_score)
+                accuracies.append(accuracy)
             except Exception as e:
                 print(f"Check the Error \n {e}")
                 print(f"Error in {util.model_type[j]}-{i} model trying to re-evaluate the model")
@@ -418,5 +418,5 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
         sample_pred = collections.Counter(sample_pred).most_common()[0][0]
         y_pred.append(sample_pred)
 
-    score.report_score(y_test, y_pred, scores, sparse_categorical=sparse_categorical, plot=plot)
+    score.report_score(y_test, y_pred, accuracies, sparse_categorical=sparse_categorical, plot=plot)
     return y_pred

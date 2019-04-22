@@ -3,7 +3,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from RMDL import plot as plt
 
-def report_score(y_test, y_pred, scores, sparse_categorical=True, plot=False):
+def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False):
     if not sparse_categorical:
         y_test = np.argmax(y_test, axis=1)
 
@@ -20,7 +20,7 @@ def report_score(y_test, y_pred, scores, sparse_categorical=True, plot=False):
         plt.plot_confusion_matrix(conf_matrix, classes=classes, normalize=True,
                                     title="Normalized Confusion Matrix")
 
-    print(f"Accuracy of each individual model of the {len(scores)} models: {scores}")
+    print(f"Accuracy of each individual model of the {len(accuracies)} models: {accuracies}")
     print(f"Overall Accuracy: {accuracy}")
     print(f"Overall Micro Metrics: {micro_metrics}")
     print(f"Overall Macro Metrics: {macro_metrics}")
