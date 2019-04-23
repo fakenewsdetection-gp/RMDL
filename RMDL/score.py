@@ -1,15 +1,23 @@
+import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-import numpy as np
 from RMDL import plot as plt
+
+
+def print_precision_recall_fscore_support(metrics, average):
+    print(f"\nOverall {average} Metrics:\n")
+    print(f"\tPrecision: {metrics[0]}\n")
+    print(f"\tRecall: {metrics[1]}\n")
+    print(f"\tF-measure: {metrics[2]}\n")
+    print(f"\tSupport: {metrics[3]}\n")
 
 
 def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False):
     if not sparse_categorical:
         y_test = np.argmax(y_test, axis=1)
-
     accuracy = accuracy_score(y_test, y_pred)
+    binary_metrics = precision_recall_fscore_support(y_test, y_pred, average='binary')
     micro_metrics = precision_recall_fscore_support(y_test, y_pred, average='micro')
     macro_metrics = precision_recall_fscore_support(y_test, y_pred, average='macro')
     weighted_metrics = precision_recall_fscore_support(y_test, y_pred, average='weighted')
@@ -22,8 +30,13 @@ def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False
         plt.plot_confusion_matrix(conf_matrix, classes=classes, normalize=True,
                                     title="Normalized Confusion Matrix")
 
-    print(f"Accuracy of each individual model of the {len(accuracies)} models: {accuracies}")
-    print(f"Overall Accuracy: {accuracy}")
-    print(f"Overall Micro Metrics: {micro_metrics}")
-    print(f"Overall Macro Metrics: {macro_metrics}")
-    print(f"Overall Weighted Metrics: {weighted_metrics}")
+    print(f"Accuracy of each individual model of the {len(accuracies)} models: {accuracies}\n")
+    print(f"Overall Accuracy: {accuracy}\n")
+    print(f"Overall Binary Metrics:\n")
+    print_precision_recall_fscore_support(binary_metrics, "Binary")
+    print(f"Overall Micro Metrics:\n")
+    print_precision_recall_fscore_support(micro_metrics, "Micro")
+    print(f"Overall Macro Metrics:\n")
+    print_precision_recall_fscore_support(macro_metrics, "Macro")
+    print(f"Overall Weighted Metrics:\n")
+    print_precision_recall_fscore_support(weighted_metrics, "Weighted")
