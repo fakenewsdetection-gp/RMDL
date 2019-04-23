@@ -32,11 +32,7 @@ def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False
 
     print(f"Accuracy of each individual model of the {len(accuracies)} models: {accuracies}\n")
     print(f"Overall Accuracy: {accuracy}\n")
-    print(f"Overall Binary Metrics:\n")
     print_precision_recall_fscore_support(binary_metrics, "Binary")
-    print(f"Overall Micro Metrics:\n")
     print_precision_recall_fscore_support(micro_metrics, "Micro")
-    print(f"Overall Macro Metrics:\n")
     print_precision_recall_fscore_support(macro_metrics, "Macro")
-    print(f"Overall Weighted Metrics:\n")
     print_precision_recall_fscore_support(weighted_metrics, "Weighted")
