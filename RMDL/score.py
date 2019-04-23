@@ -30,8 +30,8 @@ def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False
         plt.plot_confusion_matrix(conf_matrix, classes=classes, normalize=True,
                                     title="Normalized Confusion Matrix")
 
-    print(f"Accuracy of each individual model of the {len(accuracies)} models: {accuracies}\n")
-    print(f"Overall Accuracy: {accuracy}\n")
+    print(f"\nAccuracy of each individual model of the {len(accuracies)} models: {accuracies}\n")
+    print(f"\nOverall Accuracy: {accuracy}\n")
     print_precision_recall_fscore_support(binary_metrics, "Binary")
     print_precision_recall_fscore_support(micro_metrics, "Micro")
     print_precision_recall_fscore_support(macro_metrics, "Macro")
