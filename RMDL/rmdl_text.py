@@ -421,7 +421,7 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
         print(v)
     print(models_y_pred.values())
 
-    y_probs = np.array(models_y_pred.values()).transpose()
+    y_probs = np.array(list(models_y_pred.values())).transpose()
 
     # Debugging
     print(type(y_probs))
