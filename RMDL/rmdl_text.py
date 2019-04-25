@@ -412,6 +412,7 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     gc.collect()
 
     # Debugging
+    print(models_y_pred)
     for k, v in models_y_pred.items():
         print(k)
         print(v)
