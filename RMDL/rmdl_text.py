@@ -402,7 +402,7 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 # Debugging
-                print(y_pred)    
+                print(y_pred)
 
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
             except Exception as e:
@@ -420,8 +420,6 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
         print(k)
         print(v)
     print(models_y_pred.values())
-    print(models_y_pred.values().shape)
-
 
     y_probs = np.array(models_y_pred.values()).transpose()
 
