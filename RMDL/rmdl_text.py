@@ -401,6 +401,9 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                                                 weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
+                # Debugging
+                print(y_pred)    
+
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
             except Exception as e:
                 print(f"Error in {util.model_type[i]}-{j}\n")
