@@ -453,6 +453,11 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
             Path to tf-idf vectorizer used in preprocessing while training RMDL. It will default to "tf_idf_vectorizer.pickle".
         text_tokenizer_filepath: string, optional
             Path to text tokenizer used in preprocessing while training RMDL. It will default to "text_tokenizer.pickle".
+
+    Returns
+    -------
+        y_pred: list
+            List of the final predictions made by the ensemble using majority voting.
     """
     y_pred, models_y_pred = predict(x_test,
                                     batch_size=batch_size,
@@ -465,3 +470,4 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                                     tf_idf_vectorizer_filepath=tf_idf_vectorizer_filepath,
                                     text_tokenizer_filepath=text_tokenizer_filepath)
     score.report_score(y_test, y_pred, models_y_pred, plot=plot)
+    return y_pred

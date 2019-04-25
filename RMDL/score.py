@@ -11,9 +11,9 @@ def report_score(y_true, y_pred, models_y_pred=None, plot=False):
             print(f"\n\nClassification Report of {model_name}:\n")
             print(f"Accuracy: {accuracy_score(y_true, model_y_pred):.3f}\n")
             print(classification_report(y_true, model_y_pred))
-    print(f"\n\n\nClassification Report of RMDL as a whole:\n")
-    print(f"Accuracy: {accuracy_score(y_true, y_pred):.3f}\n")
-    print(classification_report(y_true, y_pred))
+    # print(f"\n\n\nClassification Report of RMDL:\n")
+    # print(f"Accuracy: {accuracy_score(y_true, y_pred):.3f}\n")
+    # print(classification_report(y_true, y_pred))
 
     if plot:
         conf_matrix = confusion_matrix(y_true, y_pred)
