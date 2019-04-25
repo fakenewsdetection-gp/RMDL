@@ -411,7 +411,20 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     del x_test_tokenized
     gc.collect()
 
+    # Debugging
+    for k, v in models_y_pred:
+        print(k)
+        print(v)
+    print(models_y_pred.values())
+    print(models_y_pred.values().shape)
+
+
     y_probs = np.array(models_y_pred.values()).transpose()
+
+    # Debugging
+    print(type(y_probs))
+    print(y_probs.shape)
+
     y_pred = []
     for i in range(y_probs.shape[0]):
         sample_pred = np.array(y_probs[i, :])
