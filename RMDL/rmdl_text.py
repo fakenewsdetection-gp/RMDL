@@ -418,14 +418,14 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
         sample_pred = collections.Counter(sample_pred).most_common()[0][0]
         y_pred.append(sample_pred)
     return y_pred, models_y_pred
-    
 
-def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
-                        sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
-                        weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
-                        text_tokenizer_filepath="text_tokenizer.pickle"):
+
+def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+                sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
+                weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+    evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                         sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                         weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                         text_tokenizer_filepath="text_tokenizer.pickle")
@@ -454,64 +454,15 @@ def predict_evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_wo
         text_tokenizer_filepath: string, optional
             Path to text tokenizer used in preprocessing while training RMDL. It will default to "text_tokenizer.pickle".
     """
+    y_pred, models_y_pred = predict(x_test,
+                                    batch_size=batch_size,
+                                    max_seq_len=max_seq_len,
+                                    max_num_words=max_num_words,
+                                    sparse_categorical=sparse_categorical,
+                                    random_deep=random_deep,
+                                    models_dir=models_dir,
+                                    weights_dir=weights_dir,
+                                    tf_idf_vectorizer_filepath=tf_idf_vectorizer_filepath,
+                                    text_tokenizer_filepath=text_tokenizer_filepath)
 
-    all_y_pred = []
-    accuracies = []
-
-    if not isinstance(y_test[0], list) and not isinstance(y_test[0], np.ndarray) \
-        and not sparse_categorical:
-        #checking if labels are one hot or not otherwise dense_layer will give shape error
-        print("convert labels into one hot encoded representation")
-        y_test = txt.get_one_hot_values(y_test)
-
-    if random_deep[0] != 0:
-        x_test_tf_idf = txt.get_tf_idf_vectors(x_test,
-                                                max_num_words=max_num_words,
-                                                fit=False,
-                                                vectorizer_filepath=tf_idf_vectorizer_filepath)
-    if random_deep[1] != 0 or random_deep[2] != 0:
-        x_test_tokenized, _ = txt.tokenize(x_test,
-                                            max_num_words=max_num_words,
-                                            max_seq_len=max_seq_len,
-                                            fit=False,
-                                            tokenizer_filepath=text_tokenizer_filepath)
-
-    del x_test
-    gc.collect()
-
-    for i in range(len(random_deep)):
-        for j in range(random_deep[i]):
-            try:
-                print(f"\nEvaluating {util.model_type[i]}-{j}")
-                model_file = f"{util.model_type[i]}_{j}.json"
-                weights_file = f"{util.model_type[i]}_{j}.hdf5"
-                model_filepath = os.path.join(models_dir, model_file)
-                weights_filepath = os.path.join(weights_dir, weights_file)
-                if i == 0:
-                    x_test = x_test_tf_idf
-                else:
-                    x_test = x_test_tokenized
-                y_pred, accuracy = evaluate_model(x_test, y_test,
-                                                    model_filepath, weights_filepath,
-                                                    batch_size=batch_size,
-                                                    sparse_categorical=sparse_categorical)
-                print(f"Accuracy of {util.model_type[i]}-{j}: {accuracy}")
-                all_y_pred.append(y_pred)
-                accuracies.append(accuracy)
-            except Exception as e:
-                print(f"Error in {util.model_type[i]}-{j}\n")
-                print(f"Check the Error \n {e}")
-
-    del x_test
-    del x_test_tf_idf
-    del x_test_tokenized
-    gc.collect()
-
-    y_probs = np.array(all_y_pred).transpose()
-    y_pred = []
-    for i in range(y_probs.shape[0]):
-        sample_pred = np.array(y_probs[i, :])
-        sample_pred = collections.Counter(sample_pred).most_common()[0][0]
-        y_pred.append(sample_pred)
-    score.report_score(y_test, y_pred, accuracies, sparse_categorical=sparse_categorical, plot=plot)
-    return y_pred
+    score.report_score(y_test, y_pred, models_y_pred, plot=plot)
