@@ -401,9 +401,6 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                                                 weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
-                # Debugging
-                print(y_pred)
-
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
             except Exception as e:
                 print(f"Error in {util.model_type[i]}-{j}\n")
@@ -414,19 +411,7 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     del x_test_tokenized
     gc.collect()
 
-    # Debugging
-    print(models_y_pred)
-    for k, v in models_y_pred.items():
-        print(k)
-        print(v)
-    print(models_y_pred.values())
-
     y_probs = np.array(list(models_y_pred.values())).transpose()
-
-    # Debugging
-    print(type(y_probs))
-    print(y_probs.shape)
-
     y_pred = []
     for i in range(y_probs.shape[0]):
         sample_pred = np.array(y_probs[i, :])
@@ -479,5 +464,4 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                                     weights_dir=weights_dir,
                                     tf_idf_vectorizer_filepath=tf_idf_vectorizer_filepath,
                                     text_tokenizer_filepath=text_tokenizer_filepath)
-
     score.report_score(y_test, y_pred, models_y_pred, plot=plot)
