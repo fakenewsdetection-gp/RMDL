@@ -125,7 +125,10 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
         values = line.split()
         word = values[0]
         try:
-            coefs = np.asarray(values[1:] + [1 if word in bias_lexicon else 0], dtype='float32')
+            if len(bias_lexicon) > 0:
+                coefs = np.asarray(values[1:] + [1 if word in bias_lexicon else 0], dtype='float32')
+            else:
+                coefs = np.asarray(values[1:], dtype='float32')
         except:
             pass
         embeddings_index[word] = coefs
@@ -135,8 +138,11 @@ def loadData_Tokenizer(X_train, X_test,GloVe_DIR,MAX_NB_WORDS,MAX_SEQUENCE_LENGT
 
 def loadBiasLexicon(path):
     lexicon = []
-    with open(path) as f:
-        lexicon = [line for line in f]
+    try:
+        with open(path) as f:
+            lexicon = [line for line in f]
+    except FileNotFoundError:
+        print('File "', path, '" not found')
     return lexicon
 
 def loadData(X_train, X_test,MAX_NB_WORDS=75000):
@@ -147,9 +153,11 @@ def loadData(X_train, X_test,MAX_NB_WORDS=75000):
     for key, val in vectorizer_x.vocabulary_.items():
         vocab[val] = key
     X_train_bias = [[vec[i] if vocab[i] in bias_lexicon else 0 for i in range(len(vec))] for vec in X_train]
-    X_train = np.concatenate((X_train, X_train_bias), axis=1)
+    if len(bias_lexicon) > 0:
+        X_train = np.concatenate((X_train, X_train_bias), axis=1)
     X_test = vectorizer_x.transform(X_test).toarray()
     X_test_bias = [[vec[i] if vocab[i] in bias_lexicon else 0 for i in range(len(vec))] for vec in X_test]
-    X_test = np.concatenate((X_test, X_test_bias), axis=1)
+    if len(bias_lexicon) > 0:
+        X_test = np.concatenate((X_test, X_test_bias), axis=1)
     print("tf-idf with",str(np.array(X_train).shape[1]),"features")
     return (X_train,X_test)
