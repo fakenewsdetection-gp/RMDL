@@ -1,38 +1,24 @@
 import numpy as np
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from RMDL import plot as plt
 
 
-def print_precision_recall_fscore_support(metrics, average):
-    print(f"\nOverall {average} Metrics:\n")
-    print(f"\tPrecision: {metrics[0]}\n")
-    print(f"\tRecall: {metrics[1]}\n")
-    print(f"\tF-measure: {metrics[2]}\n")
-    print(f"\tSupport: {metrics[3]}\n")
-
-
-def report_score(y_test, y_pred, accuracies, sparse_categorical=True, plot=False):
-    if not sparse_categorical:
-        y_test = np.argmax(y_test, axis=1)
-    accuracy = accuracy_score(y_test, y_pred)
-    binary_metrics = precision_recall_fscore_support(y_test, y_pred, average='binary')
-    micro_metrics = precision_recall_fscore_support(y_test, y_pred, average='micro')
-    macro_metrics = precision_recall_fscore_support(y_test, y_pred, average='macro')
-    weighted_metrics = precision_recall_fscore_support(y_test, y_pred, average='weighted')
-    conf_matrix = confusion_matrix(y_test, y_pred)
+def report_score(y_true, y_pred, models_y_pred=None, plot=False):
+    if models_y_pred is not None:
+        for model_name, model_y_pred in models_y_pred.items():
+            print(f"\n\nClassification Report of {model_name}:\n")
+            print(f"Accuracy: {accuracy_score(y_true, model_y_pred)}\n")
+            classification_report(y_true, model_y_pred)
+    print(f"\n\n\nClassification Report of RMDL as a whole:\n")
+    print(f"Accuracy: {accuracy_score(y_true, y_pred)}")
+    classification_report(y_true, y_pred)
 
     if plot:
+        conf_matrix = confusion_matrix(y_true, y_pred)
         classes = list(range(np.max(y_test) + 1))
         plt.plot_confusion_matrix(conf_matrix, classes=classes,
                                     title="Non-Normalized Confusion Matrix")
         plt.plot_confusion_matrix(conf_matrix, classes=classes, normalize=True,
                                     title="Normalized Confusion Matrix")
-
-    print(f"\nAccuracy of each individual model of the {len(accuracies)} models: {accuracies}\n")
-    print(f"\nOverall Accuracy: {accuracy}\n")
-    print_precision_recall_fscore_support(binary_metrics, "Binary")
-    print_precision_recall_fscore_support(micro_metrics, "Micro")
-    print_precision_recall_fscore_support(macro_metrics, "Macro")
-    print_precision_recall_fscore_support(weighted_metrics, "Weighted")
