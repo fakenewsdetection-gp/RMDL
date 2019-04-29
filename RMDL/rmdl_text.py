@@ -22,7 +22,7 @@ import collections
 
 from sklearn.metrics import accuracy_score
 from keras.callbacks import ModelCheckpoint
-from keras.models import model_from_json
+from keras.models import load_model
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt
@@ -31,11 +31,9 @@ from RMDL import plot as plt
 from RMDL import score
 
 
-def predict_single_model(x_test, model_filepath, weights_filepath,
-                            batch_size=128, sparse_categorical=True):
-    with open(model_filepath, "r") as model_file:
-        model = model_from_json(model_file.read())
-    model.load_weights(weights_filepath)
+def predict_single_model(x_test, model_filepath, batch_size=128,
+                            sparse_categorical=True):
+    model = load_model(model_filepath)
     if sparse_categorical:
         y_pred = model.predict_classes(x_test, batch_size=batch_size)
         y_pred = np.array(y_pred)
@@ -185,13 +183,6 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[0]:
         try:
             print(f"\nBuilding and Training DNN-{i}")
-            model_file = f"DNN_{i}.json"
-            weights_file = f"DNN_{i}.hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            mode='min')
             model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
                                                             number_of_classes,
                                                             sparse_categorical,
@@ -201,9 +192,12 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             max_nodes_dnn,
                                                             random_optimizor,
                                                             dropout)
-            model_json = model_DNN.to_json()
-            with open(os.path.join(models_dir, model_file), "w") as model_DNN_file:
-                model_DNN_file.write(model_json)
+            model_file = f"DNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(models_dir, model_file),
+                                            monitor='val_loss',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='min')
             model_history = model_DNN.fit(x_train_tf_idf, y_train,
                                             validation_data=(x_val_tf_idf, y_val),
                                             epochs=epochs[0],
@@ -230,13 +224,6 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[1]:
         try:
             print(f"\nBuilding and Training RNN-{i}")
-            model_file = f"RNN_{i}.json"
-            weights_file = f"RNN_{i}.hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            mode='min')
             model_RNN, _ = BuildModel.Build_Model_RNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
@@ -249,9 +236,12 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             max_nodes_rnn,
                                                             random_optimizor,
                                                             dropout)
-            model_json = model_RNN.to_json()
-            with open(os.path.join(models_dir, model_file), "w") as model_RNN_file:
-                model_RNN_file.write(model_json)
+            model_file = f"RNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(models_dir, model_file),
+                                            monitor='val_loss',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='min')
             model_history = model_RNN.fit(x_train_tokenized, y_train,
                                             validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[1],
@@ -276,13 +266,6 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[2]:
         try:
             print(f"\nBuilding and Training CNN-{i}")
-            model_file = f"CNN_{i}.json"
-            weights_file = f"CNN_{i}.hdf5"
-            checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            mode='min')
             model_CNN, _ = BuildModel.Build_Model_CNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
@@ -295,9 +278,12 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
                                                             max_nodes_cnn,
                                                             random_optimizor,
                                                             dropout)
-            model_json = model_CNN.to_json()
-            with open(os.path.join(models_dir, model_file), "w") as model_CNN_file:
-                model_CNN_file.write(model_json)
+            model_file = f"CNN_{i}.hdf5"
+            checkpoint = ModelCheckpoint(os.path.join(models_dir, model_file),
+                                            monitor='val_loss',
+                                            verbose=1,
+                                            save_best_only=True,
+                                            mode='min')
             model_history = model_CNN.fit(x_train_tokenized, y_train,
                                             validation_data=(x_val_tokenized, y_val),
                                             epochs=epochs[2],
@@ -323,14 +309,12 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
 
 def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
-                models_dir="models", weights_dir="weights",
-                tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
     predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
-                    models_dir="models", weights_dir="weights",
-                    tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                    models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                     text_tokenizer_filepath="text_tokenizer.pickle")
 
     Parameters
@@ -348,8 +332,6 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
             random_deep[1] is number of RNNs, random_deep[2] is number of CNNs. It will default to [3, 3, 3].
         models_dir: string, optional
             Path to the directory where the pre-trained models are saved. It will default to "models".
-        weights_dir: string, optional
-            Path to the directory where the weights of the pre-trained models are saved. It will default to "weights".
         tf_idf_vectorizer_filepath: string, optional
             Path to tf-idf vectorizer used in preprocessing while training RMDL. It will default to "tf_idf_vectorizer.pickle".
         text_tokenizer_filepath: string, optional
@@ -388,17 +370,14 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
         for j in range(random_deep[i]):
             try:
                 print(f"\nPredicting Using {util.model_type[i]}-{j}")
-                model_file = f"{util.model_type[i]}_{j}.json"
-                weights_file = f"{util.model_type[i]}_{j}.hdf5"
+                model_file = f"{util.model_type[i]}_{j}.hdf5"
                 model_filepath = os.path.join(models_dir, model_file)
-                weights_filepath = os.path.join(weights_dir, weights_file)
                 if i == 0:
                     x_test = x_test_tf_idf
                 else:
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
                                                 model_filepath,
-                                                weights_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
@@ -422,12 +401,12 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
 
 def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
-                weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
     evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                         sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
-                        weights_dir="weights", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                        tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                         text_tokenizer_filepath="text_tokenizer.pickle")
 
     Parameters
@@ -447,8 +426,6 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
             Plot confusion matrices(non-normalized and normalized).
         models_dir: string, optional
             Path to the directory where the pre-trained models are saved. It will default to "models".
-        weights_dir: string, optional
-            Path to the directory where the weights of the pre-trained models are saved. It will default to "weights".
         tf_idf_vectorizer_filepath: string, optional
             Path to tf-idf vectorizer used in preprocessing while training RMDL. It will default to "tf_idf_vectorizer.pickle".
         text_tokenizer_filepath: string, optional
@@ -466,7 +443,6 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
                                     sparse_categorical=sparse_categorical,
                                     random_deep=random_deep,
                                     models_dir=models_dir,
-                                    weights_dir=weights_dir,
                                     tf_idf_vectorizer_filepath=tf_idf_vectorizer_filepath,
                                     text_tokenizer_filepath=text_tokenizer_filepath)
     score.report_score(y_test, y_pred, models_y_pred, plot=plot)

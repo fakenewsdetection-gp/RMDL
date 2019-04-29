@@ -24,5 +24,3 @@ def setup():
     np.random.seed(7)
     if not os.path.isdir("models"):
         os.makedirs("models")
-    if not os.path.isdir("weights"):
-        os.makedirs("weights")
