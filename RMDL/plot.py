@@ -21,7 +21,6 @@ import itertools
 
 def plot_history(history):
     """Plots the training and validation history(accuracy and loss) of RMDL."""
-
     num_models = len(history)
     caption = []
     for i in range(len(history)):

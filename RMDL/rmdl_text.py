@@ -188,10 +188,10 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             model_file = f"DNN_{i}.json"
             weights_file = f"DNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_acc',
+                                            monitor='val_loss',
                                             verbose=1,
                                             save_best_only=True,
-                                            mode='max')
+                                            mode='min')
             model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
                                                             number_of_classes,
                                                             sparse_categorical,
@@ -233,10 +233,10 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             model_file = f"RNN_{i}.json"
             weights_file = f"RNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_acc',
+                                            monitor='val_loss',
                                             verbose=1,
                                             save_best_only=True,
-                                            mode='max')
+                                            mode='min')
             model_RNN, _ = BuildModel.Build_Model_RNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
@@ -279,10 +279,10 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             model_file = f"CNN_{i}.json"
             weights_file = f"CNN_{i}.hdf5"
             checkpoint = ModelCheckpoint(os.path.join(weights_dir, weights_file),
-                                            monitor='val_acc',
+                                            monitor='val_loss',
                                             verbose=1,
                                             save_best_only=True,
-                                            mode='max')
+                                            mode='min')
             model_CNN, _ = BuildModel.Build_Model_CNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
