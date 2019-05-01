@@ -24,8 +24,6 @@ import re
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 import pickle
 
-nltk.download("stopwords")
-
 
 def transliterate(line):
     cedilla2latin = [
