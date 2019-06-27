@@ -242,7 +242,7 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
             i += 1
             del model_RNN
             gc.collect()
-        except:
+        except Exception as e:
             print(f"\nCheck the Error \n {e}")
             print(f"Error in RNN-{i} model trying to re-generate another model")
             if max_hidden_layer_rnn > 3:
@@ -284,7 +284,7 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
             i += 1
             del model_CNN
             gc.collect()
-        except:
+        except Exception as e:
             print(f"\nCheck the Error \n {e}")
             print(f"Error in CNN-{i} model trying to re-generate another model")
             if max_hidden_layer_cnn > 5:
