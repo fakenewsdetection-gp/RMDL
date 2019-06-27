@@ -47,7 +47,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
-            min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
+            min_hidden_layer_dnn=1, max_hidden_layer_dnn=4, min_nodes_dnn=128, max_nodes_dnn=512,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
             random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
@@ -209,7 +209,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_DNN
             gc.collect()
         except Exception as e:
-            print(f"Check the Error \n {e}")
+            print(f"\nCheck the Error \n {e}")
             print(f"Error in DNN-{i} model trying to re-generate another model")
             if max_hidden_layer_dnn > 3:
                 max_hidden_layer_dnn -= 1
@@ -253,7 +253,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_RNN
             gc.collect()
         except:
-            print(f"Check the Error \n {e}")
+            print(f"\nCheck the Error \n {e}")
             print(f"Error in RNN-{i} model trying to re-generate another model")
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
@@ -295,7 +295,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
             del model_CNN
             gc.collect()
         except:
-            print(f"Check the Error \n {e}")
+            print(f"\nCheck the Error \n {e}")
             print(f"Error in CNN-{i} model trying to re-generate another model")
             if max_hidden_layer_cnn > 5:
                 max_hidden_layer_cnn -= 1
@@ -382,8 +382,8 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                                                 sparse_categorical=sparse_categorical)
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
             except Exception as e:
+                print(f"\nCheck the Error \n {e}")
                 print(f"Error in {util.model_type[i]}-{j}\n")
-                print(f"Check the Error \n {e}")
 
     del x_test
     del x_test_tf_idf
