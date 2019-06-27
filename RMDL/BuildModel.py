@@ -119,7 +119,7 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
     else:
         model.add(Dense(nClasses, activation='softmax'))
         metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-          TrueNegatives(), FalsePositives(), FalseNegatives()])
+          TrueNegatives(), FalsePositives(), FalseNegatives()]
     model_tmp = model
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
@@ -164,7 +164,7 @@ def Build_Model_DNN_Text(shape, nClasses, sparse_categorical,
     else:
         model.add(Dense(nClasses, activation='softmax'))
         metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-          TrueNegatives(), FalsePositives(), FalseNegatives()])
+          TrueNegatives(), FalsePositives(), FalseNegatives()]
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
@@ -212,7 +212,7 @@ def Build_Model_CNN_Image(shape, nclasses, sparse_categorical,
     else:
         model.add(Dense(nClasses, activation='softmax', kernel_constraint=MaxNorm(3)))
         metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-          TrueNegatives(), FalsePositives(), FalseNegatives()])
+          TrueNegatives(), FalsePositives(), FalseNegatives()]
     model_tmp = model
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
@@ -257,7 +257,7 @@ def Build_Model_RNN_Image(shape,
     else:
         prediction = Dense(nclasses, activation='softmax')(encoded_columns)
         metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-          TrueNegatives(), FalsePositives(), FalseNegatives()])
+          TrueNegatives(), FalsePositives(), FalseNegatives()]
     model = Model(x, prediction)
     model_tmp = model
     if sparse_categorical:
@@ -319,7 +319,7 @@ def Build_Model_RNN_Text(word_index, embeddings_index, nclasses,  MAX_SEQUENCE_L
     else:
         model.add(Dense(nClasses, activation='softmax'))
         metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-          TrueNegatives(), FalsePositives(), FalseNegatives()])
+          TrueNegatives(), FalsePositives(), FalseNegatives()]
     #model = to_multi_gpu(model, 3)
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
@@ -389,7 +389,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
         else:
             model.add(Dense(nClasses, activation='softmax'))
             metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-              TrueNegatives(), FalsePositives(), FalseNegatives()])
+              TrueNegatives(), FalsePositives(), FalseNegatives()]
         #model = Model(sequence_input, preds)
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
@@ -459,7 +459,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
         else:
             preds = Dense(nClasses, activation='softmax')(l_dense)
             metrics_list = [Accuracy(), Precision(), Recall(), TruePositives(),
-              TrueNegatives(), FalsePositives(), FalseNegatives()])
+              TrueNegatives(), FalsePositives(), FalseNegatives()]
         model = Model(sequence_input, preds)
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
