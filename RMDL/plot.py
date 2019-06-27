@@ -27,6 +27,22 @@ def plot_history(history):
         caption.append('RDL ' + str(i + 1))
 
     for i in range(num_models):
+        plt.plot(history[i].history['loss'])
+        plt.title('RMDL Training Loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_loss'])
+        plt.title('RMDL Validation Loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
         plt.plot(history[i].history['acc'])
         plt.title('RMDL Training Accuracy')
         plt.ylabel('Accuracy')
@@ -43,17 +59,97 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['loss'])
-        plt.title('RMDL Training Loss')
-        plt.ylabel('Loss')
+        plt.plot(history[i].history['prec'])
+        plt.title('RMDL Training Precision')
+        plt.ylabel('Precision')
         plt.xlabel('Epoch')
     plt.legend(caption, loc='upper right')
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_loss'])
-        plt.title('RMDL Validation Loss')
-        plt.ylabel('Loss')
+        plt.plot(history[i].history['val_prec'])
+        plt.title('RMDL Validation Precision')
+        plt.ylabel('Precision')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['rec'])
+        plt.title('RMDL Training Recall')
+        plt.ylabel('Recall')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_rec'])
+        plt.title('RMDL Validation Recall')
+        plt.ylabel('Recall')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['true_pos'])
+        plt.title('RMDL Training True Positives')
+        plt.ylabel('True Positives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_true_pos'])
+        plt.title('RMDL Validation True Positives')
+        plt.ylabel('True Positives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['true_neg'])
+        plt.title('RMDL Training True Negatives')
+        plt.ylabel('True Negatives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_true_neg'])
+        plt.title('RMDL Validation True Negatives')
+        plt.ylabel('True Negatives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['false_pos'])
+        plt.title('RMDL Training False Positives')
+        plt.ylabel('False Positives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_false_pos'])
+        plt.title('RMDL Validation False Positives')
+        plt.ylabel('False Positives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['false_neg'])
+        plt.title('RMDL Training False Negatives')
+        plt.ylabel('False Negatives')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_false_neg'])
+        plt.title('RMDL Validation False Negatives')
+        plt.ylabel('False Negatives')
         plt.xlabel('Epoch')
     plt.legend(caption, loc='upper right')
     plt.show()
