@@ -46,7 +46,7 @@ def predict_single_model(x_test, model_filepath, batch_size=128,
     return y_pred
 
 
-def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
+def train(x_train, y_train, x_val, y_val, number_of_classes, class_weight=None, batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
@@ -55,17 +55,20 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
             random_state=42, random_optimizor=True, dropout=0.5):
     """
-    train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
+    train(x_train, y_train, x_val, y_val, number_of_classes, class_weight=None batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
-            min_hidden_layer_dnn=1, max_hidden_layer_dnn=8, min_nodes_dnn=128, max_nodes_dnn=1024,
+            min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
             random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0)
 
         Parameters
         ----------
+            class_weight: dict, optional
+                Dictionary mapping class indices (integers) to a weight (float) value, used for weighting the loss function (during training only).
+                This can be useful to tell the model to "pay more attention" to samples from an under-represented class.
             batch_size: int, optional
                 Number of samples per gradient update. It will default to 128.
             embedding_dim: int, optional
@@ -193,7 +196,8 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
                                             epochs=epochs[0],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
-                                            verbose=2)
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_DNN
@@ -237,7 +241,8 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
                                             epochs=epochs[1],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
-                                            verbose=2)
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_RNN
@@ -279,7 +284,8 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, batch_size=128,
                                             epochs=epochs[2],
                                             batch_size=batch_size,
                                             callbacks=[checkpoint],
-                                            verbose=2)
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_CNN
