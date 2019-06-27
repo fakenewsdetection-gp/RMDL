@@ -20,13 +20,11 @@ print(tf.__version__)
 
 from tensorflow.keras.models import Sequential, Model
 import numpy as np
-from tensorflow.keras.constraints import maxnorm
+from tensorflow.keras.constraints import MaxNorm
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.layers import Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
-    Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input
+    Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Lambda, Concatenate
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers.core import Lambda
-from tensorflow.keras.layers.merge import Concatenate
 from tensorflow.keras import optimizers
 from tensorflow.keras.metrics import Accuracy, Precision, Recall, TruePositives,\
     TrueNegatives, FalsePositives, FalseNegatives
@@ -198,7 +196,7 @@ def Build_Model_CNN_Image(shape, nclasses, sparse_categorical,
     model.add(Flatten())
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(dropout))
-    model.add(Dense(nclasses,activation='softmax',kernel_constraint=maxnorm(3)))
+    model.add(Dense(nclasses,activation='softmax',kernel_constraint=MaxNorm(3)))
     model_tmp = model
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
