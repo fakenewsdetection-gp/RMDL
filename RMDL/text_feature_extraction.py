@@ -131,18 +131,20 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_fil
     return text_tokenized, word_index
 
 
-def get_word_embeddings_index(glove_filepath):
-    embeddings_index = {}
+def get_word_embedding_index(glove_filepath):
+    embedding_index = {}
     with open(glove_filepath, encoding="utf8") as glove_file:
         for line in glove_file:
             values = line.split()
             word = values[0]
             try:
-                coefs = np.asarray(values[1:], dtype='float32')
+                float(values[1])
             except:
-                pass
-            embeddings_index[word] = coefs
-    return embeddings_index
+                continue
+            if word == 'UNK' or word in word_index:
+                coefs = np.asarray(values[1:], dtype='float32')
+                embedding_index[word] = coefs
+    return embedding_index
 
 
 def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=None):

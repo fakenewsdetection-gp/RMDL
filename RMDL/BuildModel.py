@@ -300,17 +300,17 @@ def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes,  MAX_S
 
     layer = random.choice(values_layer)
     print(layer)
-    embedding_matrix = np.random.random((len(word_index) + 1, EMBEDDING_DIM))
+
+
+    embedding_matrix = np.zeros(len(word_index) + 1, EMBEDDING_DIM)
     for word, i in word_index.items():
-        embedding_vector = embeddings_index.get(word)
+        embedding_vector = embedding_index.get(word)
         if embedding_vector is not None:
             # words not found in embedding index will be all-zeros.
-            if len(embedding_matrix[i]) != len(embedding_vector):
-                print("could not broadcast input array from shape", str(len(embedding_matrix[i])),
-                      "into shape", str(len(embedding_vector)), " Please make sure your"
-                                                                " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                exit(1)
             embedding_matrix[i] = embedding_vector
+        else:
+            embedding_matrix[i] = embedding_index['UNK']
+
     model.add(Embedding(len(word_index) + 1,
                                 EMBEDDING_DIM,
                                 weights=[embedding_matrix],
@@ -364,17 +364,14 @@ def Build_Model_CNN_Text(word_index, embeddings_index, number_of_classes, MAX_SE
 
     model = Sequential()
     if simple_model:
-        embedding_matrix = np.random.random((len(word_index) + 1, EMBEDDING_DIM))
+        embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
         for word, i in word_index.items():
-            embedding_vector = embeddings_index.get(word)
+            embedding_vector = embedding_index.get(word)
             if embedding_vector is not None:
-                if len(embedding_matrix[i]) !=len(embedding_vector):
-                    print("could not broadcast input array from shape",str(len(embedding_matrix[i])),
-                                     "into shape",str(len(embedding_vector))," Please make sure your"
-                                     " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                    exit(1)
                 # words not found in embedding index will be all-zeros.
                 embedding_matrix[i] = embedding_vector
+            else:
+                embedding_matrix[i] = embedding_index['UNK']
         model.add(Embedding(len(word_index) + 1,
                             EMBEDDING_DIM,
                             weights=[embedding_matrix],
@@ -415,19 +412,14 @@ def Build_Model_CNN_Text(word_index, embeddings_index, number_of_classes, MAX_SE
                               optimizer=optimizors(random_optimizor),
                               metrics=metrics_list)
     else:
-        embedding_matrix = np.random.random((len(word_index) + 1, EMBEDDING_DIM))
+        embedding_matrix = np.zeros(len(word_index) + 1, EMBEDDING_DIM)
         for word, i in word_index.items():
-            embedding_vector = embeddings_index.get(word)
+            embedding_vector = embedding_index.get(word)
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
-                if len(embedding_matrix[i]) !=len(embedding_vector):
-                    print("could not broadcast input array from shape",str(len(embedding_matrix[i])),
-                                     "into shape",str(len(embedding_vector))," Please make sure your"
-                                     " EMBEDDING_DIM is equal to embedding_vector file ,GloVe,")
-                    exit(1)
-
                 embedding_matrix[i] = embedding_vector
-
+            else:
+                embedding_matrix[i] = embedding_index['UNK']
         embedding_layer = Embedding(len(word_index) + 1,
                                     EMBEDDING_DIM,
                                     weights=[embedding_matrix],
