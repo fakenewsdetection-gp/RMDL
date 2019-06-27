@@ -20,9 +20,12 @@ import os
 import numpy as np
 import collections
 
-from sklearn.metrics import accuracy_score
-from keras.callbacks import ModelCheckpoint
-from keras.models import load_model
+import tensorflow as tf
+print(tf.__version__)
+
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
+
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
 from RMDL import text_feature_extraction as txt

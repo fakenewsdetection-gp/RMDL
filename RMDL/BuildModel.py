@@ -14,21 +14,24 @@ RMDL: Random Multimodel Deep Learning for Classification
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-from keras.models import Sequential
-import numpy as np
-from keras.constraints import maxnorm
-from keras.layers import Dense, Flatten
-from keras.layers import Conv1D,MaxPooling2D, \
-    MaxPooling1D, Embedding, Dropout,\
-    GRU,TimeDistributed,Conv2D,\
-    Activation,LSTM,Input
-from keras import backend as K
-from keras.models import Model
-from keras.layers.core import Lambda
-from keras.layers.merge import Concatenate
+
 import tensorflow as tf
-from keras import optimizers
+print(tf.__version__)
+
+from tensorflow.keras.models import Sequential, Model
+import numpy as np
+from tensorflow.keras.constraints import maxnorm
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.layers import Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
+    Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers.core import Lambda
+from tensorflow.keras.layers.merge import Concatenate
+from tensorflow.keras import optimizers
+from tensorflow.keras.metrics import Accuracy, Precision, Recall, TruePositives,\
+    TrueNegatives, FalsePositives, FalseNegatives
 import random
+
 
 def optimizors(random_optimizor):
     if random_optimizor:
@@ -49,7 +52,6 @@ def optimizors(random_optimizor):
     return opt
 
 
-
 def slice_batch(x, n_gpus, part):
     """
     Divide the input batch into [n_gpus] slices, and obtain slice number [part].
@@ -61,6 +63,7 @@ def slice_batch(x, n_gpus, part):
     if part == n_gpus - 1:
         return x[part*L:]
     return x[part*L:(part+1)*L]
+
 
 def to_multi_gpu(model, n_gpus=2):
     """
@@ -116,11 +119,13 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     return model,model_tmp
 
 
@@ -154,11 +159,13 @@ def Build_Model_DNN_Text(shape, nClasses, sparse_categorical,
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     return model,model_tem
 
 
@@ -196,15 +203,15 @@ def Build_Model_CNN_Image(shape, nclasses, sparse_categorical,
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
 
     return model,model_tmp
-
-
 
 
 def Build_Model_RNN_Image(shape,
@@ -225,10 +232,10 @@ def Build_Model_RNN_Image(shape,
     x = Input(shape=shape)
 
     # Encodes a row of pixels using TimeDistributed Wrapper.
-    encoded_rows = TimeDistributed(LSTM(node,recurrent_dropout=dropout))(x)
+    encoded_rows = TimeDistributed(CuDNNLSTM(node,recurrent_dropout=dropout))(x)
     node = random.choice(values)
     # Encodes columns of encoded rows.
-    encoded_columns = LSTM(node,recurrent_dropout=dropout)(encoded_rows)
+    encoded_columns = CuDNNLSTM(node,recurrent_dropout=dropout)(encoded_rows)
 
     # Final predictions and model.
     #prediction = Dense(256, activation='relu')(encoded_columns)
@@ -238,11 +245,13 @@ def Build_Model_RNN_Image(shape,
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                   optimizer=optimizors(random_optimizor),
-                  metrics=['accuracy'])
+                  metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                    TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         model.compile(loss='categorical_crossentropy',
                   optimizer=optimizors(random_optimizor),
-                  metrics=['accuracy'])
+                  metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                    TrueNegatives(), FalsePositives(), FalseNegatives()])
     return model,model_tmp
 
 
@@ -282,25 +291,25 @@ def Build_Model_RNN_Text(word_index, embeddings_index, nclasses,  MAX_SEQUENCE_L
     gru_node = random.choice(values)
     print(gru_node)
     for i in range(0,layer):
-        model.add(GRU(gru_node,return_sequences=True, recurrent_dropout=0.2))
+        model.add(CuDNNGRU(gru_node,return_sequences=True))
         model.add(Dropout(dropout))
-    model.add(GRU(gru_node, recurrent_dropout=0.2))
+    model.add(CuDNNGRU(gru_node))
     model.add(Dropout(dropout))
     model.add(Dense(256, activation='relu'))
     model.add(Dense(nclasses, activation='softmax'))
 
     model_tmp = model
     #model = to_multi_gpu(model, 3)
-
-
     if sparse_categorical:
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=['accuracy'])
+                      metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                        TrueNegatives(), FalsePositives(), FalseNegatives()])
     return model,model_tmp
 
 
@@ -361,11 +370,13 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=['accuracy'])
+                          metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                            TrueNegatives(), FalsePositives(), FalseNegatives()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=['accuracy'])
+                          metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                            TrueNegatives(), FalsePositives(), FalseNegatives()])
     else:
         embedding_matrix = np.random.random((len(word_index) + 1, EMBEDDING_DIM))
         for word, i in word_index.items():
@@ -425,11 +436,11 @@ def Build_Model_CNN_Text(word_index, embeddings_index, nclasses, MAX_SEQUENCE_LE
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=['accuracy'])
+                          metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                            TrueNegatives(), FalsePositives(), FalseNegatives()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=['accuracy'])
-
-
-    return model,model_tmp
+                          metrics=[Accuracy(), Precision(), Recall(), TruePositives(),
+                            TrueNegatives(), FalsePositives(), FalseNegatives()])
+    return model, model_tmp
