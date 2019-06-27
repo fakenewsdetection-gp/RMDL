@@ -186,7 +186,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[0]:
         try:
             print(f"\nBuilding and Training DNN-{i}")
-            model_DNN, _ = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
+            model_DNN = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
                                                             number_of_classes,
                                                             sparse_categorical,
                                                             min_hidden_layer_dnn,
@@ -227,7 +227,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[1]:
         try:
             print(f"\nBuilding and Training RNN-{i}")
-            model_RNN, _ = BuildModel.Build_Model_RNN_Text(word_index,
+            model_RNN = BuildModel.Build_Model_RNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
                                                             max_seq_len,
@@ -269,7 +269,7 @@ def train(x_train, y_train, x_val,  y_val, batch_size=128,
     while i < random_deep[2]:
         try:
             print(f"\nBuilding and Training CNN-{i}")
-            model_CNN, _ = BuildModel.Build_Model_CNN_Text(word_index,
+            model_CNN = BuildModel.Build_Model_CNN_Text(word_index,
                                                             embeddings_index,
                                                             number_of_classes,
                                                             max_seq_len,
