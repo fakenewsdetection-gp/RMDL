@@ -284,12 +284,12 @@ def Build_Model_RNN_Image(shape,
     return model, model_tmp
 
 
-def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
+def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
                          min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout):
     """
-    def buildModel_RNN(word_index, embeddings_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):
+    def buildModel_RNN(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):
     word_index in word index ,
-    embeddings_index is embeddings index, look at data_helper.py
+    embedding_index is embeddings index, look at data_helper.py
     number_of_classes is number of classes,
     MAX_SEQUENCE_LENGTH is maximum lenght of text sequences
     """
@@ -346,14 +346,14 @@ def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes, MAX_SE
     return model
 
 
-def Build_Model_CNN_Text(word_index, embeddings_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
+def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
                        min_hidden_layer_cnn, max_hidden_layer_cnn, min_nodes_cnn, max_nodes_cnn, random_optimizor,
                        dropout, simple_model=False):
 
     """
-        def buildModel_CNN(word_index,embeddings_index,number_of_classes,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM,Complexity=0):
+        def buildModel_CNN(word_index,embedding_index,number_of_classes,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM,Complexity=0):
         word_index in word index ,
-        embeddings_index is embeddings index, look at data_helper.py
+        embedding_index is embeddings index, look at data_helper.py
         number_of_classes is number of classes,
         MAX_SEQUENCE_LENGTH is maximum lenght of text sequences,
         EMBEDDING_DIM is an int value for dimention of word embedding look at data_helper.py
