@@ -316,12 +316,12 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         plt.plot_history(history)
 
 
-def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
+def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
+    predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
                     models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                     text_tokenizer_filepath="text_tokenizer.pickle")
