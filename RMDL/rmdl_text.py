@@ -34,15 +34,18 @@ from RMDL import plot as plt
 from RMDL import score
 
 
-def predict_single_model(x_test, model_filepath, batch_size=128,
+def predict_single_model(x_test, model_filepath, number_of_classes, batch_size=128,
                             sparse_categorical=True):
     model = load_model(model_filepath)
-    if sparse_categorical:
-        y_pred = model.predict_classes(x_test, batch_size=batch_size)
-        y_pred = np.array(y_pred)
-    else:
+    if number_of_classes == 2:
         y_pred = model.predict(x_test, batch_size=batch_size)
-        y_pred = np.argmax(y_pred, axis=1)
+    else:
+        if sparse_categorical:
+            y_pred = model.predict_classes(x_test, batch_size=batch_size)
+            y_pred = np.array(y_pred)
+        else:
+            y_pred = model.predict(x_test, batch_size=batch_size)
+            y_pred = np.argmax(y_pred, axis=1)
     return y_pred
 
 
@@ -303,12 +306,12 @@ def train(x_train, y_train, x_val, y_val, number_of_classes, class_weight=None, 
         plt.plot_history(history)
 
 
-def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+    predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
                     models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                     text_tokenizer_filepath="text_tokenizer.pickle")
@@ -373,6 +376,7 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 else:
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
+                                                number_of_classes,
                                                 model_filepath,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
@@ -395,12 +399,12 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     return y_pred, models_y_pred
 
 
-def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+def evaluate(x_test, y_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                 tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+    evaluate(x_test, y_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                         sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                         tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                         text_tokenizer_filepath="text_tokenizer.pickle")
@@ -433,6 +437,7 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
             List of the final predictions made by the ensemble using majority voting.
     """
     y_pred, models_y_pred = predict(x_test,
+                                    number_of_classes,
                                     batch_size=batch_size,
                                     max_seq_len=max_seq_len,
                                     max_num_words=max_num_words,
