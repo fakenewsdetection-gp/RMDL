@@ -302,7 +302,7 @@ def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes, MAX_SE
     print(layer)
 
 
-    embedding_matrix = np.zeros(len(word_index) + 1, EMBEDDING_DIM)
+    embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
     for word, i in word_index.items():
         embedding_vector = embedding_index.get(word)
         if embedding_vector is not None:
@@ -412,7 +412,7 @@ def Build_Model_CNN_Text(word_index, embeddings_index, number_of_classes, MAX_SE
                               optimizer=optimizors(random_optimizor),
                               metrics=metrics_list)
     else:
-        embedding_matrix = np.zeros(len(word_index) + 1, EMBEDDING_DIM)
+        embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
         for word, i in word_index.items():
             embedding_vector = embedding_index.get(word)
             if embedding_vector is not None:
