@@ -146,7 +146,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
     if isinstance(y_train, list):
         number_of_classes = len(set(y_train))
     elif isinstance(y_train, np.ndarray):
-        number_of_classes = y_train.unique().shape[0]
+        number_of_classes = np.unique(y_train).shape[0]
 
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) \
         and not sparse_categorical and not number_of_classes == 2:
