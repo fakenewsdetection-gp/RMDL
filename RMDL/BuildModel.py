@@ -284,7 +284,7 @@ def Build_Model_RNN_Image(shape,
     return model, model_tmp
 
 
-def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes,  MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
+def Build_Model_RNN_Text(word_index, embeddings_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
                          min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout):
     """
     def buildModel_RNN(word_index, embeddings_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):

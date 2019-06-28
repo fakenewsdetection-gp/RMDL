@@ -144,6 +144,9 @@ def get_word_embedding_index(glove_filepath):
             if word == 'UNK' or word in word_index:
                 coefs = np.asarray(values[1:], dtype='float32')
                 embedding_index[word] = coefs
+    if 'UNK' not in embedding_index:
+        embedding_vecs = np.fromiter(embedding_index.values(), dtype=float)
+        embedding_index['UNK'] = np.mean(embedding_vecs, axis=0)
     return embedding_index
 
 
