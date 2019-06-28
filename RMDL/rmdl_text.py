@@ -316,12 +316,12 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         plt.plot_history(history)
 
 
-def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+    predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
                     models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                     text_tokenizer_filepath="text_tokenizer.pickle")
@@ -360,11 +360,6 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     """
     models_y_pred = {}
 
-    if isinstance(y_train, list):
-        number_of_classes = len(set(y_train))
-    elif isinstance(y_train, np.ndarray):
-        number_of_classes = y_train.unique().shape[0]
-
     if random_deep[0] != 0:
         x_test_tf_idf = txt.get_tf_idf_vectors(x_test,
                                                 max_num_words=max_num_words,
@@ -391,8 +386,8 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 else:
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
-                                                number_of_classes,
                                                 model_filepath,
+                                                number_of_classes,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
@@ -451,7 +446,13 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
         y_pred: list
             List of the final predictions made by the ensemble using majority voting.
     """
+    if isinstance(y_test, list):
+        number_of_classes = len(set(y_test))
+    elif isinstance(y_test, np.ndarray):
+        number_of_classes = np.unique(y_test).shape[0]
+
     y_pred, models_y_pred = predict(x_test,
+                                    number_of_classes,
                                     batch_size=batch_size,
                                     max_seq_len=max_seq_len,
                                     max_num_words=max_num_words,
