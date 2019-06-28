@@ -131,7 +131,7 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_fil
     return text_tokenized, word_index
 
 
-def get_word_embedding_index(glove_filepath):
+def get_word_embedding_index(glove_filepath, word_index):
     embedding_index = {}
     with open(glove_filepath, encoding="utf8") as glove_file:
         for line in glove_file:
@@ -145,7 +145,7 @@ def get_word_embedding_index(glove_filepath):
                 coefs = np.asarray(values[1:], dtype='float32')
                 embedding_index[word] = coefs
     if 'UNK' not in embedding_index:
-        embedding_vecs = np.fromiter(embedding_index.values(), dtype=float)
+        embedding_vecs = np.fromiter(list(embedding_index.values()), dtype=float)
         embedding_index['UNK'] = np.mean(embedding_vecs, axis=0)
     return embedding_index
 

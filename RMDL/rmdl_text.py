@@ -179,7 +179,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                                         max_seq_len=max_seq_len)
         x_train_tokenized = all_text_tokenized[:len(x_train), ]
         x_val_tokenized = all_text_tokenized[len(x_train):, ]
-        embeddings_index = txt.get_word_embedding_index(glove_filepath)
+        embeddings_index = txt.get_word_embedding_index(glove_filepath, word_index)
 
     del x_train
     del x_val
