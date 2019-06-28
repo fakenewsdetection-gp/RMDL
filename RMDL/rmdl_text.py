@@ -38,7 +38,7 @@ def predict_single_model(x_test, model_filepath, number_of_classes, batch_size=1
                             sparse_categorical=True):
     model = load_model(model_filepath)
     if number_of_classes == 2:
-        y_pred = np.array(np.model.predict(x_test, batch_size=batch_size))
+        y_pred = np.array(model.predict(x_test, batch_size=batch_size))
     else:
         if sparse_categorical:
             y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size))

@@ -21,5 +21,6 @@ from . import rmdl_text
 from . import rmdl_image
 from . import text_feature_extraction
 from . import plot
+from . import metric
 
 __version__ = '1.0.3'
