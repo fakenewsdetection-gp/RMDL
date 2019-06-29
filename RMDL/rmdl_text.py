@@ -377,10 +377,10 @@ def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
     """
     models_y_pred = {}
 
-    if isinstance(y_train, list):
-        number_of_classes = len(set(y_train))
-    elif isinstance(y_train, np.ndarray):
-        number_of_classes = np.unique(y_train).shape[0]
+    if isinstance(y_test, list):
+        number_of_classes = len(set(y_test))
+    elif isinstance(y_test, np.ndarray):
+        number_of_classes = np.unique(y_test).shape[0]
 
     if random_deep[0] != 0:
         x_test_tf_idf = txt.get_tf_idf_vectors(x_test,
