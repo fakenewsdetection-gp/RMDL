@@ -37,7 +37,7 @@ from RMDL import score
 def predict_single_model(x_test, model_filepath, number_of_classes, batch_size=128,
                             sparse_categorical=True):
     model = load_model(model_filepath)
-    if sparse_categorical or number_of_classes == 2:
+    if number_of_classes == 2 or sparse_categorical:
         y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size))
     else:
         y_pred = model.predict(x_test, batch_size=batch_size)
