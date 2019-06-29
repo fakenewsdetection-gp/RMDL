@@ -26,9 +26,7 @@ from tensorflow.keras.layers import Conv1D, MaxPooling2D, MaxPooling1D, Embeddin
     Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Lambda, Concatenate
 from tensorflow.keras import backend as K
 from tensorflow.keras import optimizers
-from tensorflow.keras.metrics import BinaryAccuracy, Accuracy, Precision, Recall, TruePositives,\
-    TrueNegatives, FalsePositives, FalseNegatives
-# from RMDL.metric import F1_Score
+import keras_metrics as km
 import random
 
 
@@ -118,21 +116,24 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
         model_tmp = model
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
-                        metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                            TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                        metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                            km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                            km.binary_false_positive(), km.binary_false_negative()])
     else:
         model.add(Dense(number_of_classes, activation='softmax'))
         model_tmp = model
-        metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-            TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                              km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                              km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                              km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                              km.categorical_false_positive(), km.categorical_false_negative()])
     return model, model_tmp
 
 
@@ -165,20 +166,23 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
         model.add(Dense(1, activation='sigmoid'))
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
-                        metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                            TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                        metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                            km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                            km.binary_false_positive(), km.binary_false_negative()])
     else:
         model.add(Dense(number_of_classes, activation='softmax'))
-        metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-            TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                              km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                              km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                              km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                              km.categorical_false_positive(), km.categorical_false_negative()])
     return model
 
 
@@ -216,21 +220,24 @@ def Build_Model_CNN_Image(shape, number_of_classes, sparse_categorical,
         model_tmp = model
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
-                        metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                            TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                        metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                            km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                            km.binary_false_positive(), km.binary_false_negative()])
     else:
         model.add(Dense(number_of_classes, activation='softmax', kernel_constraint=MaxNorm(3)))
         model_tmp = model
-        metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-           TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                              km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                              km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                              km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                              km.categorical_false_positive(), km.categorical_false_negative()])
     return model, model_tmp
 
 
@@ -269,19 +276,22 @@ def Build_Model_RNN_Image(shape,
     if number_of_classes == 2:
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
-                        metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                            TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                        metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                            km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                            km.binary_false_positive(), km.binary_false_negative()])
     else:
-        metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-            TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=metrics_list)
+                      metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                          km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                          km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
-                      metrics=metrics_list)
+                      metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                          km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                          km.categorical_false_positive(), km.categorical_false_negative()])
     return model, model_tmp
 
 
@@ -330,20 +340,23 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         model.add(Dense(1, activation='sigmoid'))
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
-                        metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                            TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                        metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                            km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                            km.binary_false_positive(), km.binary_false_negative()])
     else:
         model.add(Dense(number_of_classes, activation='softmax'))
-        metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-            TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                              km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                              km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
-                          metrics=metrics_list)
+                          metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                              km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                              km.categorical_false_positive(), km.categorical_false_negative()])
     return model
 
 
@@ -398,20 +411,23 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
             model.add(Dense(1, activation='sigmoid'))
             model.compile(loss='binary_crossentropy',
                             optimizer=optimizors(random_optimizor),
-                            metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                                TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                            metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                                km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                                km.binary_false_positive(), km.binary_false_negative()])
         else:
             model.add(Dense(number_of_classes, activation='softmax'))
-            metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-                TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
             if sparse_categorical:
                 model.compile(loss='sparse_categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
-                              metrics=metrics_list)
+                              metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                                  km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                                  km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
-                              metrics=metrics_list)
+                              metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                                  km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                                  km.categorical_false_positive(), km.categorical_false_negative()])
     else:
         embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
         for word, i in word_index.items():
@@ -468,17 +484,20 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         if number_of_classes == 2:
             model.compile(loss='binary_crossentropy',
                             optimizer=optimizors(random_optimizor),
-                            metrics=[BinaryAccuracy(name='acc'), Precision(name='prec'), Recall(name='rec'),
-                                TruePositives(name='true_pos'),TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')])
+                            metrics=['accuracy', km.binary_precision(), km.binary_recall(),
+                                km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
+                                km.binary_false_positive(), km.binary_false_negative()])
         else:
-            metrics_list = [Accuracy(name='acc'), Precision(name='prec'), Recall(name='rec'), TruePositives(name='true_pos'),
-                TrueNegatives(name='true_neg'), FalsePositives(name='false_pos'), FalseNegatives(name='false_neg')]
             if sparse_categorical:
                 model.compile(loss='sparse_categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
-                              metrics=metrics_list)
+                              metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
+                                  km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
+                                  km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
-                              metrics=metrics_list)
+                              metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
+                                  km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                                  km.categorical_false_positive(), km.categorical_false_negative()])
     return model

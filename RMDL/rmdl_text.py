@@ -200,13 +200,16 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-            model_history = model_DNN.fit(x_train_tf_idf, y_train,
-                                            validation_data=(x_val_tf_idf, y_val),
-                                            epochs=epochs[0],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+
+            with tf.Session() as s:
+                s.run(tf.global_variables_initializer())
+                model_history = model_DNN.fit(x_train_tf_idf, y_train,
+                                                validation_data=(x_val_tf_idf, y_val),
+                                                epochs=epochs[0],
+                                                batch_size=batch_size,
+                                                callbacks=[checkpoint],
+                                                verbose=2,
+                                                class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_DNN
@@ -245,13 +248,15 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-            model_history = model_RNN.fit(x_train_tokenized, y_train,
-                                            validation_data=(x_val_tokenized, y_val),
-                                            epochs=epochs[1],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+            with tf.Session() as s:
+                s.run(tf.global_variables_initializer())
+                model_history = model_RNN.fit(x_train_tokenized, y_train,
+                                                validation_data=(x_val_tokenized, y_val),
+                                                epochs=epochs[1],
+                                                batch_size=batch_size,
+                                                callbacks=[checkpoint],
+                                                verbose=2,
+                                                class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_RNN
@@ -288,13 +293,15 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-            model_history = model_CNN.fit(x_train_tokenized, y_train,
-                                            validation_data=(x_val_tokenized, y_val),
-                                            epochs=epochs[2],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+            with tf.Session() as s:
+                s.run(tf.global_variables_initializer())
+                model_history = model_CNN.fit(x_train_tokenized, y_train,
+                                                validation_data=(x_val_tokenized, y_val),
+                                                epochs=epochs[2],
+                                                batch_size=batch_size,
+                                                callbacks=[checkpoint],
+                                                verbose=2,
+                                                class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_CNN
@@ -310,6 +317,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 
     if plot:
         plt.plot_history(history)
+    return history
 
 
 def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
