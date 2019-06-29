@@ -127,8 +127,9 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
                           metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                    km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                    km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                    km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
@@ -177,8 +178,9 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
                           metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                    km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                    km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                    km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
@@ -232,8 +234,9 @@ def Build_Model_CNN_Image(shape, number_of_classes, sparse_categorical,
             model.compile(loss='sparse_categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                        km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                        km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                        km.sparse_categorical_false_negative()]
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
@@ -286,8 +289,9 @@ def Build_Model_RNN_Image(shape,
             model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
                       metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                       optimizer=optimizors(random_optimizor),
@@ -353,8 +357,9 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
             model.compile(loss='sparse_categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
                           metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                    km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                    km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                    km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                    km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),
@@ -426,13 +431,14 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
                 model.compile(loss='sparse_categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                        km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                        km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                        km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
                               metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
-                                        km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                                        km.categorical_f1_score(), km.categorical_true_positive(),km.categorical_true_negative(),
                                         km.categorical_false_positive(), km.categorical_false_negative()])
     else:
         embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
@@ -499,12 +505,13 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
                 model.compile(loss='sparse_categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
-                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(), km.sparse_categorical_true_negative(),
-                                        km.sparse_categorical_false_positive(), km.sparse_categorical_false_negative()])
+                                        km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
+                                        km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
+                                        km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
                               optimizer=optimizors(random_optimizor),
                               metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
-                                        km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
+                                        km.categorical_f1_score(), km.categorical_true_positive(),km.categorical_true_negative(),
                                         km.categorical_false_positive(), km.categorical_false_negative()])
     return model, model_tmp
