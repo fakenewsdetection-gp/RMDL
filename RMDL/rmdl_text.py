@@ -23,8 +23,8 @@ import collections
 import tensorflow as tf
 print(tf.__version__)
 
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import load_model
+from keras.callbacks import ModelCheckpoint
+from keras.models import load_model
 
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
@@ -200,16 +200,13 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-
-            with tf.Session() as s:
-                s.run(tf.global_variables_initializer())
-                model_history = model_DNN.fit(x_train_tf_idf, y_train,
-                                                validation_data=(x_val_tf_idf, y_val),
-                                                epochs=epochs[0],
-                                                batch_size=batch_size,
-                                                callbacks=[checkpoint],
-                                                verbose=2,
-                                                class_weight=class_weight)
+            model_history = model_DNN.fit(x_train_tf_idf, y_train,
+                                            validation_data=(x_val_tf_idf, y_val),
+                                            epochs=epochs[0],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_DNN
@@ -248,15 +245,13 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-            with tf.Session() as s:
-                s.run(tf.global_variables_initializer())
-                model_history = model_RNN.fit(x_train_tokenized, y_train,
-                                                validation_data=(x_val_tokenized, y_val),
-                                                epochs=epochs[1],
-                                                batch_size=batch_size,
-                                                callbacks=[checkpoint],
-                                                verbose=2,
-                                                class_weight=class_weight)
+            model_history = model_RNN.fit(x_train_tokenized, y_train,
+                                            validation_data=(x_val_tokenized, y_val),
+                                            epochs=epochs[1],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_RNN
@@ -293,15 +288,13 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                             verbose=1,
                                             save_best_only=True,
                                             mode='min')
-            with tf.Session() as s:
-                s.run(tf.global_variables_initializer())
-                model_history = model_CNN.fit(x_train_tokenized, y_train,
-                                                validation_data=(x_val_tokenized, y_val),
-                                                epochs=epochs[2],
-                                                batch_size=batch_size,
-                                                callbacks=[checkpoint],
-                                                verbose=2,
-                                                class_weight=class_weight)
+            model_history = model_CNN.fit(x_train_tokenized, y_train,
+                                            validation_data=(x_val_tokenized, y_val),
+                                            epochs=epochs[2],
+                                            batch_size=batch_size,
+                                            callbacks=[checkpoint],
+                                            verbose=2,
+                                            class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_CNN

@@ -18,14 +18,15 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 print(tf.__version__)
 
-from tensorflow.keras.models import Sequential, Model
+from keras.models import Sequential, Model
 import numpy as np
-from tensorflow.keras.constraints import MaxNorm
-from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.layers import Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
-    Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Lambda, Concatenate
-from tensorflow.keras import backend as K
-from tensorflow.keras import optimizers
+from keras.constraints import maxnorm
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
+    Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input
+from keras.layers.core import Lambda
+from keras.layers.merge import Concatenate
+from keras import backend as K
+from keras import optimizers
 import keras_metrics as km
 import random
 
@@ -216,7 +217,7 @@ def Build_Model_CNN_Image(shape, number_of_classes, sparse_categorical,
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(dropout))
     if number_of_classes == 2:
-        model.add(Dense(1, activation='sigmoid', kernel_constraint=MaxNorm(3)))
+        model.add(Dense(1, activation='sigmoid', kernel_constraint=maxnorm(3)))
         model_tmp = model
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
@@ -224,7 +225,7 @@ def Build_Model_CNN_Image(shape, number_of_classes, sparse_categorical,
                             km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                             km.binary_false_positive(), km.binary_false_negative()])
     else:
-        model.add(Dense(number_of_classes, activation='softmax', kernel_constraint=MaxNorm(3)))
+        model.add(Dense(number_of_classes, activation='softmax', kernel_constraint=maxnorm(3)))
         model_tmp = model
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
