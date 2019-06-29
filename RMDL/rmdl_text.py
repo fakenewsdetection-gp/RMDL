@@ -323,7 +323,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
     return history
 
 
-def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
+def predict(x_test, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
@@ -394,7 +394,6 @@ def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
                                                 model_filepath,
-                                                number_of_classes,
                                                 batch_size=batch_size,
                                                 sparse_categorical=sparse_categorical)
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
@@ -407,16 +406,7 @@ def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_
     del x_test_tokenized
     gc.collect()
 
-    print("before transpose")
-    y_probs = np.array(list(models_y_pred.values()))
-    print(y_probs)
-    print(y_probs.shape)
-
-    y_probs = y_probs.transpose()
-
-    print("after transpose")
-    print(y_probs)
-    print(y_probs.shape)
+    y_probs = np.array(list(models_y_pred.values())).transpose()
 
     y_pred = []
     for i in range(y_probs.shape[0]):
@@ -463,13 +453,7 @@ def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=7500
         y_pred: list
             List of the final predictions made by the ensemble using majority voting.
     """
-    if isinstance(y_test, list):
-        number_of_classes = len(set(y_test))
-    elif isinstance(y_test, np.ndarray):
-        number_of_classes = np.unique(y_test).shape[0]
-
     y_pred, models_y_pred = predict(x_test,
-                                    number_of_classes,
                                     batch_size=batch_size,
                                     max_seq_len=max_seq_len,
                                     max_num_words=max_num_words,
