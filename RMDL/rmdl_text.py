@@ -62,7 +62,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=128,  max_nodes_rnn=512,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-            random_state=42, random_optimizor=True, dropout=0.5):
+            random_state=42, random_optimizor=True, dropout=0.5, l2=0.01):
     """
     train(x_train, y_train, x_val, y_val, class_weight=None batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
@@ -202,7 +202,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                                                         min_nodes_dnn,
                                                                         max_nodes_dnn,
                                                                         random_optimizor,
-                                                                        dropout)
+                                                                        dropout, _l2=l2)
             model_arch_file = f"DNN_{i}.json"
             model_weights_file = f"DNN_{i}.hdf5"
             model_json = model_tmp_DNN.to_json()
@@ -252,7 +252,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                                                         min_nodes_rnn,
                                                                         max_nodes_rnn,
                                                                         random_optimizor,
-                                                                        dropout)
+                                                                        dropout, _l2=l2)
             model_arch_file = f"RNN_{i}.json"
             model_weights_file = f"RNN_{i}.hdf5"
             model_json = model_tmp_RNN.to_json()
@@ -300,7 +300,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                                                         min_nodes_cnn,
                                                                         max_nodes_cnn,
                                                                         random_optimizor,
-                                                                        dropout)
+                                                                        dropout, _l2=l2)
             model_arch_file = f"CNN_{i}.json"
             model_weights_file = f"CNN_{i}.hdf5"
             model_json = model_tmp_CNN.to_json()

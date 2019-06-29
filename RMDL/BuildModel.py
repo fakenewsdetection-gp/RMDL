@@ -23,6 +23,7 @@ from keras.models import Sequential, Model
 from keras.constraints import maxnorm
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
         Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Bidirectional
+from keras.regularizers import l2
 from keras.layers.core import Lambda
 from keras.layers.merge import Concatenate
 from keras import backend as K
@@ -141,7 +142,7 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
 
 def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
                          min_hidden_layer_dnn, max_hidden_layer_dnn, min_nodes_dnn,
-                         max_nodes_dnn, random_optimizor, dropout):
+                         max_nodes_dnn, random_optimizor, dropout, _l2=0.01):
     """
     buildModel_DNN_Tex(shape, number_of_classes,sparse_categorical)
     Build Deep neural networks Model for text classification
@@ -156,15 +157,15 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
     nLayers = random.choice(layer)
 
     Numberof_NOde_old = Numberof_NOde
-    model.add(Dense(Numberof_NOde,input_dim=shape,activation='relu'))
+    model.add(Dense(Numberof_NOde,input_dim=shape,activation='relu', kernel_regularizer=l2(_l2)))
     model.add(Dropout(dropout))
     for i in range(0,nLayers):
         Numberof_NOde = random.choice(node)
-        model.add(Dense(Numberof_NOde,input_dim=Numberof_NOde_old,activation='relu'))
+        model.add(Dense(Numberof_NOde,input_dim=Numberof_NOde_old,activation='relu', kernel_regularizer=l2(_l2)))
         model.add(Dropout(dropout))
         Numberof_NOde_old = Numberof_NOde
     if number_of_classes == 2:
-        model.add(Dense(1, activation='sigmoid'))
+        model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
         model_tmp = model
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
@@ -172,7 +173,7 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
                                     km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                     km.binary_false_positive(), km.binary_false_negative()])
     else:
-        model.add(Dense(number_of_classes, activation='softmax'))
+        model.add(Dense(number_of_classes, activation='softmax', kernel_regularizer=l2(_l2)))
         model_tmp = model
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
@@ -302,7 +303,7 @@ def Build_Model_RNN_Image(shape,
 
 
 def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
-                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout):
+                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout, _l2=0.01):
     """
     def buildModel_RNN(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):
     word_index in word index ,
@@ -337,13 +338,13 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     gru_node = random.choice(values)
     print(gru_node)
     for i in range(0,layer):
-        model.add(Bidirectional(CuDNNGRU(gru_node,return_sequences=True)))
+        model.add(Bidirectional(CuDNNGRU(gru_node,return_sequences=True, kernel_regularizer=l2(_l2))))
         model.add(Dropout(dropout))
-    model.add(Bidirectional(CuDNNGRU(gru_node)))
+    model.add(Bidirectional(CuDNNGRU(gru_node, kernel_regularizer=l2(_l2))))
     model.add(Dropout(dropout))
-    model.add(Dense(256, activation='relu'))
+    model.add(Dense(256, activation='relu', kernel_regularizer=l2(_l2)))
     if number_of_classes == 2:
-        model.add(Dense(1, activation='sigmoid'))
+        model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
         model_tmp = model
         model.compile(loss='binary_crossentropy',
                         optimizer=optimizors(random_optimizor),
@@ -351,7 +352,7 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
                                     km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                     km.binary_false_positive(), km.binary_false_negative()])
     else:
-        model.add(Dense(number_of_classes, activation='softmax'))
+        model.add(Dense(number_of_classes, activation='softmax', kernel_regularizer=l2(_l2)))
         model_tmp = model
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
@@ -371,7 +372,7 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
 
 def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
                        min_hidden_layer_cnn, max_hidden_layer_cnn, min_nodes_cnn, max_nodes_cnn, random_optimizor,
-                       dropout, simple_model=False):
+                       dropout, simple_model=False, _l2=0.01):
 
     """
         def buildModel_CNN(word_index,embedding_index,number_of_classes,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM,Complexity=0):
@@ -405,19 +406,19 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         Layer = random.choice(Layer)
         for i in range(0,Layer):
             Filter = random.choice(values)
-            model.add(Conv1D(Filter, 5, activation='relu'))
+            model.add(Conv1D(Filter, 5, activation='relu', kernel_regularizer=l2(_l2)))
             model.add(Dropout(dropout))
             model.add(MaxPooling1D(5))
 
         model.add(Flatten())
         Filter = random.choice(values)
-        model.add(Dense(Filter, activation='relu'))
+        model.add(Dense(Filter, activation='relu', kernel_regularizer=l2(_l2)))
         model.add(Dropout(dropout))
         Filter = random.choice(values)
-        model.add(Dense(Filter, activation='relu'))
+        model.add(Dense(Filter, activation='relu', kernel_regularizer=l2(_l2)))
         model.add(Dropout(dropout))
         if number_of_classes == 2:
-            model.add(Dense(1, activation='sigmoid'))
+            model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
             model_tmp = model
             model.compile(loss='binary_crossentropy',
                             optimizer=optimizors(random_optimizor),
@@ -425,7 +426,7 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
                                         km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                         km.binary_false_positive(), km.binary_false_negative()])
         else:
-            model.add(Dense(number_of_classes, activation='softmax'))
+            model.add(Dense(number_of_classes, activation='softmax', kernel_regularizer=l2(_l2)))
             model_tmp = model
             if sparse_categorical:
                 model.compile(loss='sparse_categorical_crossentropy',
