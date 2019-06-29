@@ -52,7 +52,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-            random_state=42, random_optimizor=True, dropout=0.5):
+            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0):
     """
     train(x_train, y_train, x_val, y_val, class_weight=None batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
@@ -61,7 +61,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
             min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-            random_state=42, random_optimizor=True, dropout=0.5)
+            random_state=42, random_optimizor=True, dropout=0.5, no_of_classes=0)
 
         Parameters
         ----------
@@ -124,6 +124,8 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                 If False, all models use adam optimizer. If True, all models use random optimizers. It will default to True
             dropout: float, optional
                 between 0 and 1. Fraction of the units to drop for the linear transformation of the inputs.
+            no_of_classes: int, optional
+                Number of classes to perform classification upon.
 
         Returns
         -------
@@ -139,11 +141,6 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 
     history = []
 
-    if isinstance(y_train, list):
-        number_of_classes = len(set(y_train))
-    elif isinstance(y_train, np.ndarray):
-        number_of_classes = np.unique(y_train).shape[0]
-
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) \
         and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error
@@ -153,7 +150,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 
     glove_needed = random_deep[1] != 0 or random_deep[2] != 0
     if glove_needed:
-        if glove_dir == "":
+        if glove_dir == "" and glove_file == "":
             glove_dir = GloVe.download_and_extract()
             glove_filepath = os.path.join(glove_dir, glove_file)
         else:
