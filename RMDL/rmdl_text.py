@@ -41,7 +41,7 @@ def predict_single_model(x_test, number_of_classes, model_arch_filepath, model_w
     model = model_from_json(loaded_model_json)
     model.load_weights(model_weights_filepath)
     if number_of_classes == 2:
-        y_pred = np.array(np.rint(model.predict(x_test, batch_size=batch_size)), dtype="int32")
+        y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
     else:
         if sparse_categorical:
             y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size), dtype="int32")
