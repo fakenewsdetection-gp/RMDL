@@ -59,7 +59,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['prec'])
+        plt.plot(history[i].history['precision'])
         plt.title('RMDL Training Precision')
         plt.ylabel('Precision')
         plt.xlabel('Epoch')
@@ -67,7 +67,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_prec'])
+        plt.plot(history[i].history['val_precision'])
         plt.title('RMDL Validation Precision')
         plt.ylabel('Precision')
         plt.xlabel('Epoch')
@@ -75,7 +75,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['rec'])
+        plt.plot(history[i].history['recall'])
         plt.title('RMDL Training Recall')
         plt.ylabel('Recall')
         plt.xlabel('Epoch')
@@ -83,7 +83,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_rec'])
+        plt.plot(history[i].history['val_recall'])
         plt.title('RMDL Validation Recall')
         plt.ylabel('Recall')
         plt.xlabel('Epoch')
@@ -91,7 +91,23 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['true_pos'])
+        plt.plot(history[i].history['f1_score'])
+        plt.title('RMDL Training F1 score')
+        plt.ylabel('Recall')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['val_f1_score'])
+        plt.title('RMDL Validation F1 score')
+        plt.ylabel('Recall')
+        plt.xlabel('Epoch')
+    plt.legend(caption, loc='upper right')
+    plt.show()
+
+    for i in range(num_models):
+        plt.plot(history[i].history['true_positive'])
         plt.title('RMDL Training True Positives')
         plt.ylabel('True Positives')
         plt.xlabel('Epoch')
@@ -99,7 +115,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_true_pos'])
+        plt.plot(history[i].history['val_true_positive'])
         plt.title('RMDL Validation True Positives')
         plt.ylabel('True Positives')
         plt.xlabel('Epoch')
@@ -107,7 +123,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['true_neg'])
+        plt.plot(history[i].history['true_negative'])
         plt.title('RMDL Training True Negatives')
         plt.ylabel('True Negatives')
         plt.xlabel('Epoch')
@@ -115,7 +131,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_true_neg'])
+        plt.plot(history[i].history['val_true_negative'])
         plt.title('RMDL Validation True Negatives')
         plt.ylabel('True Negatives')
         plt.xlabel('Epoch')
@@ -123,7 +139,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['false_pos'])
+        plt.plot(history[i].history['false_positive'])
         plt.title('RMDL Training False Positives')
         plt.ylabel('False Positives')
         plt.xlabel('Epoch')
@@ -131,7 +147,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_false_pos'])
+        plt.plot(history[i].history['val_false_positive'])
         plt.title('RMDL Validation False Positives')
         plt.ylabel('False Positives')
         plt.xlabel('Epoch')
@@ -139,7 +155,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['false_neg'])
+        plt.plot(history[i].history['false_negative'])
         plt.title('RMDL Training False Negatives')
         plt.ylabel('False Negatives')
         plt.xlabel('Epoch')
@@ -147,7 +163,7 @@ def plot_history(history):
     plt.show()
 
     for i in range(num_models):
-        plt.plot(history[i].history['val_false_neg'])
+        plt.plot(history[i].history['val_false_negative'])
         plt.title('RMDL Validation False Negatives')
         plt.ylabel('False Negatives')
         plt.xlabel('Epoch')
