@@ -236,7 +236,7 @@ def Build_Model_CNN_Image(shape, number_of_classes, sparse_categorical,
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
                                         km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
                                         km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
-                                        km.sparse_categorical_false_negative()]
+                                        km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
                           optimizer=optimizors(random_optimizor),

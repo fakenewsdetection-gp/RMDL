@@ -34,20 +34,24 @@ from RMDL import plot as plt
 from RMDL import score
 
 
-def predict_single_model(x_test, number_of_classes, model_arch_filepath, model_weights_filepath,
-                            batch_size=128, sparse_categorical=True):
+def predict_single_model(x_test, number_of_classes, weighted_prediction, model_arch_filepath,
+                            model_weights_filepath, batch_size=128, sparse_categorical=True):
     with open(model_arch_filepath, "r") as model_json:
         loaded_model_json = model_json.read()
     model = model_from_json(loaded_model_json)
     model.load_weights(model_weights_filepath)
     if number_of_classes == 2:
-        y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
+        if not weighted_prediction
+            y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
+        else:
+            y_pred = model.predict(x_test, batch_size=batch_size)
     else:
         if sparse_categorical:
             y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size), dtype="int32")
         else:
             y_pred = model.predict(x_test, batch_size=batch_size)
-            y_pred = np.argmax(y_pred, axis=1)
+            if not weighted_prediction:
+                y_pred = np.argmax(y_pred, axis=1)
     return y_pred
 
 
@@ -333,18 +337,20 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
     return history
 
 
-def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
+def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_words=75000,
+    predict(x_test, number_of_classes, weighted_prediction, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
                     models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                     text_tokenizer_filepath="text_tokenizer.pickle")
 
     Parameters
     ----------
+        weighted_prediction: bool, optional
+            Use the weighted prediction (sparse categorical cannot be used) for voting instead normal majority voting. It will default to False.
         batch_size: int, optional
             Number of samples per gradient update. It will default to 128.
         max_seq_len: int, optional
@@ -406,6 +412,7 @@ def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
                                                 number_of_classes,
+                                                weighted_prediction,
                                                 model_arch_filepath,
                                                 model_weights_filepath,
                                                 batch_size=batch_size,
@@ -422,29 +429,44 @@ def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_
 
     y_probs = np.array(list(models_y_pred.values())).transpose()
 
-    if number_of_classes == 2:
-        y_probs = np.squeeze(y_probs, axis=0)
-
-    y_pred = []
-    for i in range(y_probs.shape[0]):
-        sample_pred = np.array(y_probs[i, :])
-        sample_pred = collections.Counter(sample_pred).most_common()[0][0]
-        y_pred.append(sample_pred)
+    if weighted_prediction:
+        if number_of_classes == 2:
+            y_probs = np.squeeze(y_probs, axis=0)
+            y_probs = np.mean(y_probs, axis=1)
+            y_pred = np.array(np.rint(y_probs), dtype="int32").tolist()
+        else:
+            if not sparse_categorical:
+                y_probs = np.mean(y_probs, axis=1)
+                y_probs = np.argmax(y_probs, axis=1)
+                y_pred = np.array(np.rint(y_probs), dtype="int32").tolist()
+            else:
+                # with sparse categorical this method cannot be used.
+                pass
+    else:
+        if number_of_classes == 2:
+            y_probs = np.squeeze(y_probs, axis=0)
+        y_pred = []
+        for i in range(y_probs.shape[0]):
+            sample_pred = np.array(y_probs[i, :])
+            sample_pred = collections.Counter(sample_pred).most_common()[0][0]
+            y_pred.append(int(sample_pred))
     return y_pred, models_y_pred
 
 
-def evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+def evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                 tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     """
-    evaluate(x_test, y_test, batch_size=128, max_seq_len=500, max_num_words=75000,
+    evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
                         sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
                         tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                         text_tokenizer_filepath="text_tokenizer.pickle")
 
     Parameters
     ----------
+        weighted_prediction: bool, optional
+            Use the weighted prediction (sparse categorical cannot be used) for voting instead normal majority voting. It will default to False.
         batch_size: int, optional
             Number of samples per gradient update. It will default to 128.
         max_seq_len: int, optional
