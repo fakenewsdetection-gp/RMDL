@@ -312,7 +312,7 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     """
 
     model = Sequential()
-    values = list(range(min_nodes_rnn, max_nodes_rnn))
+    values = list(range(min_nodes_rnn, max_nodes_rnn + 1))
     values_layer = list(range(min_hidden_layer_rnn - 1,max_hidden_layer_rnn))
 
     layer = random.choice(values_layer)
