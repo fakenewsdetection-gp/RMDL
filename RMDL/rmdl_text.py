@@ -23,8 +23,8 @@ import collections
 import tensorflow as tf
 print(tf.__version__)
 
-from keras.callbacks import ModelCheckpoint
-from keras.models import load_model
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 
 from RMDL import BuildModel as BuildModel
 from RMDL.Download import Download_Glove as GloVe
