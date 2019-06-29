@@ -41,7 +41,7 @@ def predict_single_model(x_test, number_of_classes, model_arch_filepath, model_w
     model = model_from_json(loaded_model_json)
     model.load_weights(model_weights_filepath)
     if number_of_classes == 2:
-        y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
+        y_pred = np.array(np.rint(model.predict(x_test, batch_size=batch_size)), dtype="int32")
     else:
         if sparse_categorical:
             y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size), dtype="int32")
@@ -420,20 +420,10 @@ def predict(x_test, number_of_classes, batch_size=128, max_seq_len=500, max_num_
     del x_test_tokenized
     gc.collect()
 
+    y_probs = np.array(list(models_y_pred.values())).transpose()
 
-    y_probs = np.array(list(models_y_pred.values()))
-    print("before transpose")
-    print(y_probs)
-    print()
-    print()
-    print(y_probs.shape)
-
-    y_probs = y_probs.transpose()
-    print("after transpose")
-    print(y_probs)
-    print()
-    print()
-    print(y_probs.shape)
+    if number_of_classes == 2:
+        y_probs = np.squeeze(y_probs, axis=0)
 
     y_pred = []
     for i in range(y_probs.shape[0]):
