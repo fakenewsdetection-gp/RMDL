@@ -34,10 +34,10 @@ from RMDL import plot as plt
 from RMDL import score
 
 
-def predict_single_model(x_test, model_filepath, number_of_classes, batch_size=128,
+def predict_single_model(x_test, model_filepath, batch_size=128,
                             sparse_categorical=True):
     model = load_model(model_filepath)
-    if number_of_classes == 2 or sparse_categorical:
+    if sparse_categorical:
         y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size))
     else:
         y_pred = model.predict(x_test, batch_size=batch_size)
@@ -145,7 +145,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         number_of_classes = np.unique(y_train).shape[0]
 
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) \
-        and not sparse_categorical and not number_of_classes == 2:
+        and not sparse_categorical:
         #checking if labels are one hot or not otherwise dense_layer will give shape error
         print("convert labels into one hot encoded representation")
         y_train = txt.get_one_hot_values(y_train)
@@ -180,6 +180,16 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
     del x_train
     del x_val
     gc.collect()
+
+    if no_of_classes==0:
+        #checking no_of_classes
+        #np.max(data)+1 will not work for one_hot encoding labels
+        if sparse_categorical:
+            number_of_classes = np.max(y_train) + 1
+        else:
+            number_of_classes = len(y_train[0])
+    else:
+        number_of_classes = no_of_classes
 
     i = 0
     while i < random_deep[0]:
