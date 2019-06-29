@@ -22,7 +22,7 @@ import numpy as np
 from keras.models import Sequential, Model
 from keras.constraints import maxnorm
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
-        Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input
+        Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Bidirectional
 from keras.layers.core import Lambda
 from keras.layers.merge import Concatenate
 from keras import backend as K
@@ -337,9 +337,9 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     gru_node = random.choice(values)
     print(gru_node)
     for i in range(0,layer):
-        model.add(CuDNNGRU(gru_node,return_sequences=True))
+        model.add(Bidirectional(CuDNNGRU(gru_node,return_sequences=True)))
         model.add(Dropout(dropout))
-    model.add(CuDNNGRU(gru_node))
+    model.add(Bidirectional(CuDNNGRU(gru_node)))
     model.add(Dropout(dropout))
     model.add(Dense(256, activation='relu'))
     if number_of_classes == 2:

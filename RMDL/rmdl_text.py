@@ -60,7 +60,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
             glove_dir="", glove_file="glove.6B.50d.txt",
             sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
             min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
-            min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=32,  max_nodes_rnn=128,
+            min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=128,  max_nodes_rnn=512,
             min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
             random_state=42, random_optimizor=True, dropout=0.5):
     """
