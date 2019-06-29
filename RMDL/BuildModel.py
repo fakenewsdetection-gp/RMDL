@@ -258,7 +258,7 @@ def Build_Model_RNN_Image(shape,
         num_classes is number of classes,
         shape is (w,h,p)
     """
-    values = list(range(min_nodes_rnn,max_nodes_rnn))
+    values = list(range(min_nodes_rnn - 1,max_nodes_rnn))
     node =  random.choice(values)
 
     x = Input(shape=shape)
@@ -312,8 +312,8 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     """
 
     model = Sequential()
-    values = list(range(min_nodes_rnn - 1, max_nodes_rnn))
-    values_layer = list(range(min_hidden_layer_rnn,max_hidden_layer_rnn))
+    values = list(range(min_nodes_rnn, max_nodes_rnn))
+    values_layer = list(range(min_hidden_layer_rnn - 1,max_hidden_layer_rnn))
 
     layer = random.choice(values_layer)
     print(layer)
