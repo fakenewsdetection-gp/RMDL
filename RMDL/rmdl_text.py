@@ -41,7 +41,7 @@ def predict_single_model(x_test, number_of_classes, weighted_prediction, model_a
     model = model_from_json(loaded_model_json)
     model.load_weights(model_weights_filepath)
     if number_of_classes == 2:
-        if not weighted_prediction
+        if not weighted_prediction:
             y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
         else:
             y_pred = model.predict(x_test, batch_size=batch_size)
@@ -437,8 +437,7 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
         else:
             if not sparse_categorical:
                 y_probs = np.mean(y_probs, axis=1)
-                y_probs = np.argmax(y_probs, axis=1)
-                y_pred = np.array(np.rint(y_probs), dtype="int32").tolist()
+                y_pred = np.argmax(y_probs, axis=1).tolist()
             else:
                 # with sparse categorical this method cannot be used.
                 pass
