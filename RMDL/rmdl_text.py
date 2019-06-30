@@ -33,13 +33,18 @@ from RMDL import util
 from RMDL import plot as plt
 from RMDL import score
 
+models = [[], [], []]
+tokenizer = None
+vectorizer = None
 
-def predict_single_model(x_test, number_of_classes, weighted_prediction, model_arch_filepath,
-                            model_weights_filepath, batch_size=128, sparse_categorical=True):
-    with open(model_arch_filepath, "r") as model_json:
-        loaded_model_json = model_json.read()
-    model = model_from_json(loaded_model_json)
-    model.load_weights(model_weights_filepath)
+
+def predict_single_model(x_test, number_of_classes, weighted_prediction, model_arch_filepath=None,
+                         model_weights_filepath=None, model=None, batch_size=128, sparse_categorical=True):
+    if model is None:
+        with open(model_arch_filepath, "r") as model_json:
+            loaded_model_json = model_json.read()
+        model = model_from_json(loaded_model_json)
+        model.load_weights(model_weights_filepath)
     if number_of_classes == 2:
         if not weighted_prediction:
             y_pred = np.rint(model.predict(x_test, batch_size=batch_size))
@@ -47,7 +52,8 @@ def predict_single_model(x_test, number_of_classes, weighted_prediction, model_a
             y_pred = model.predict(x_test, batch_size=batch_size)
     else:
         if sparse_categorical:
-            y_pred = np.array(model.predict_classes(x_test, batch_size=batch_size), dtype="int32")
+            y_pred = np.array(model.predict_classes(
+                x_test, batch_size=batch_size), dtype="int32")
         else:
             y_pred = model.predict(x_test, batch_size=batch_size)
             if not weighted_prediction:
@@ -56,13 +62,13 @@ def predict_single_model(x_test, number_of_classes, weighted_prediction, model_a
 
 
 def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
-            embedding_dim=50, max_seq_len=500, max_num_words=75000,
-            glove_dir="", glove_file="glove.6B.50d.txt",
-            sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
-            min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
-            min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=128,  max_nodes_rnn=512,
-            min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-            random_state=42, random_optimizor=True, dropout=0.5, l2=0.01):
+          embedding_dim=50, max_seq_len=500, max_num_words=75000,
+          glove_dir="", glove_file="glove.6B.50d.txt",
+          sparse_categorical=True, random_deep=[3, 3, 3], epochs=[500, 500, 500], plot=False,
+          min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
+          min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=128, max_nodes_rnn=512,
+          min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
+          random_state=42, random_optimizor=True, dropout=0.5, l2=0.01):
     """
     train(x_train, y_train, x_val, y_val, class_weight=None batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
@@ -154,8 +160,8 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         number_of_classes = np.unique(y_train).shape[0]
 
     if not isinstance(y_train[0], list) and not isinstance(y_train[0], np.ndarray) \
-        and not sparse_categorical and number_of_classes != 2:
-        #checking if labels are one hot or not otherwise dense_layer will give shape error
+            and not sparse_categorical and number_of_classes != 2:
+        # checking if labels are one hot or not otherwise dense_layer will give shape error
         print("convert labels into one hot encoded representation")
         y_train = txt.get_one_hot_values(y_train)
         y_val = txt.get_one_hot_values(y_val)
@@ -174,17 +180,19 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 
     all_text = np.concatenate((x_train, x_val))
     if random_deep[0] != 0:
-        all_text_tf_idf = txt.get_tf_idf_vectors(all_text, max_num_words=max_num_words)
+        all_text_tf_idf = txt.get_tf_idf_vectors(
+            all_text, max_num_words=max_num_words)
         x_train_tf_idf = all_text_tf_idf[:len(x_train), ]
         x_val_tf_idf = all_text_tf_idf[len(x_train):, ]
     if random_deep[1] != 0 or random_deep[2] != 0:
         print(glove_filepath)
         all_text_tokenized, word_index = txt.tokenize(all_text,
-                                                        max_num_words=max_num_words,
-                                                        max_seq_len=max_seq_len)
+                                                      max_num_words=max_num_words,
+                                                      max_seq_len=max_seq_len)
         x_train_tokenized = all_text_tokenized[:len(x_train), ]
         x_val_tokenized = all_text_tokenized[len(x_train):, ]
-        embeddings_index = txt.get_word_embedding_index(glove_filepath, word_index)
+        embeddings_index = txt.get_word_embedding_index(
+            glove_filepath, word_index)
 
     del x_train
     del x_val
@@ -195,39 +203,41 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         try:
             print(f"\nBuilding and Training DNN-{i}")
             model_DNN, model_tmp_DNN = BuildModel.Build_Model_DNN_Text(x_train_tf_idf.shape[1],
-                                                                        number_of_classes,
-                                                                        sparse_categorical,
-                                                                        min_hidden_layer_dnn,
-                                                                        max_hidden_layer_dnn,
-                                                                        min_nodes_dnn,
-                                                                        max_nodes_dnn,
-                                                                        random_optimizor,
-                                                                        dropout, _l2=l2)
+                                                                       number_of_classes,
+                                                                       sparse_categorical,
+                                                                       min_hidden_layer_dnn,
+                                                                       max_hidden_layer_dnn,
+                                                                       min_nodes_dnn,
+                                                                       max_nodes_dnn,
+                                                                       random_optimizor,
+                                                                       dropout, _l2=l2)
             model_arch_file = f"DNN_{i}.json"
             model_weights_file = f"DNN_{i}.hdf5"
             model_json = model_tmp_DNN.to_json()
             with open(os.path.join(models_dir, model_arch_file), "w") as model_json_file:
                 model_json_file.write(model_json)
             checkpoint = ModelCheckpoint(os.path.join(models_dir, model_weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            save_weights_only=True,
-                                            mode='min')
+                                         monitor='val_loss',
+                                         verbose=1,
+                                         save_best_only=True,
+                                         save_weights_only=True,
+                                         mode='min')
             model_history = model_DNN.fit(x_train_tf_idf, y_train,
-                                            validation_data=(x_val_tf_idf, y_val),
-                                            epochs=epochs[0],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+                                          validation_data=(
+                                              x_val_tf_idf, y_val),
+                                          epochs=epochs[0],
+                                          batch_size=batch_size,
+                                          callbacks=[checkpoint],
+                                          verbose=2,
+                                          class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_DNN
             gc.collect()
         except Exception as e:
             print(f"\nCheck the Error \n {e}")
-            print(f"Error in DNN-{i} model trying to re-generate another model")
+            print(
+                f"Error in DNN-{i} model trying to re-generate another model")
             if max_hidden_layer_dnn > 3:
                 max_hidden_layer_dnn -= 1
             if max_nodes_dnn > 256:
@@ -242,42 +252,44 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         try:
             print(f"\nBuilding and Training RNN-{i}")
             model_RNN, model_tmp_RNN = BuildModel.Build_Model_RNN_Text(word_index,
-                                                                        embeddings_index,
-                                                                        number_of_classes,
-                                                                        max_seq_len,
-                                                                        embedding_dim,
-                                                                        sparse_categorical,
-                                                                        min_hidden_layer_rnn,
-                                                                        max_hidden_layer_rnn,
-                                                                        min_nodes_rnn,
-                                                                        max_nodes_rnn,
-                                                                        random_optimizor,
-                                                                        dropout, _l2=l2)
+                                                                       embeddings_index,
+                                                                       number_of_classes,
+                                                                       max_seq_len,
+                                                                       embedding_dim,
+                                                                       sparse_categorical,
+                                                                       min_hidden_layer_rnn,
+                                                                       max_hidden_layer_rnn,
+                                                                       min_nodes_rnn,
+                                                                       max_nodes_rnn,
+                                                                       random_optimizor,
+                                                                       dropout, _l2=l2)
             model_arch_file = f"RNN_{i}.json"
             model_weights_file = f"RNN_{i}.hdf5"
             model_json = model_tmp_RNN.to_json()
             with open(os.path.join(models_dir, model_arch_file), "w") as model_json_file:
                 model_json_file.write(model_json)
             checkpoint = ModelCheckpoint(os.path.join(models_dir, model_weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            save_weights_only=True,
-                                            mode='min')
+                                         monitor='val_loss',
+                                         verbose=1,
+                                         save_best_only=True,
+                                         save_weights_only=True,
+                                         mode='min')
             model_history = model_RNN.fit(x_train_tokenized, y_train,
-                                            validation_data=(x_val_tokenized, y_val),
-                                            epochs=epochs[1],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+                                          validation_data=(
+                                              x_val_tokenized, y_val),
+                                          epochs=epochs[1],
+                                          batch_size=batch_size,
+                                          callbacks=[checkpoint],
+                                          verbose=2,
+                                          class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_RNN
             gc.collect()
         except Exception as e:
             print(f"\nCheck the Error \n {e}")
-            print(f"Error in RNN-{i} model trying to re-generate another model")
+            print(
+                f"Error in RNN-{i} model trying to re-generate another model")
             if max_hidden_layer_rnn > 3:
                 max_hidden_layer_rnn -= 1
             if max_nodes_rnn > 64:
@@ -290,42 +302,44 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
         try:
             print(f"\nBuilding and Training CNN-{i}")
             model_CNN, model_tmp_CNN = BuildModel.Build_Model_CNN_Text(word_index,
-                                                                        embeddings_index,
-                                                                        number_of_classes,
-                                                                        max_seq_len,
-                                                                        embedding_dim,
-                                                                        sparse_categorical,
-                                                                        min_hidden_layer_cnn,
-                                                                        max_hidden_layer_cnn,
-                                                                        min_nodes_cnn,
-                                                                        max_nodes_cnn,
-                                                                        random_optimizor,
-                                                                        dropout, _l2=l2)
+                                                                       embeddings_index,
+                                                                       number_of_classes,
+                                                                       max_seq_len,
+                                                                       embedding_dim,
+                                                                       sparse_categorical,
+                                                                       min_hidden_layer_cnn,
+                                                                       max_hidden_layer_cnn,
+                                                                       min_nodes_cnn,
+                                                                       max_nodes_cnn,
+                                                                       random_optimizor,
+                                                                       dropout, _l2=l2)
             model_arch_file = f"CNN_{i}.json"
             model_weights_file = f"CNN_{i}.hdf5"
             model_json = model_tmp_CNN.to_json()
             with open(os.path.join(models_dir, model_arch_file), "w") as model_json_file:
                 model_json_file.write(model_json)
             checkpoint = ModelCheckpoint(os.path.join(models_dir, model_weights_file),
-                                            monitor='val_loss',
-                                            verbose=1,
-                                            save_best_only=True,
-                                            save_weights_only=True,
-                                            mode='min')
+                                         monitor='val_loss',
+                                         verbose=1,
+                                         save_best_only=True,
+                                         save_weights_only=True,
+                                         mode='min')
             model_history = model_CNN.fit(x_train_tokenized, y_train,
-                                            validation_data=(x_val_tokenized, y_val),
-                                            epochs=epochs[2],
-                                            batch_size=batch_size,
-                                            callbacks=[checkpoint],
-                                            verbose=2,
-                                            class_weight=class_weight)
+                                          validation_data=(
+                                              x_val_tokenized, y_val),
+                                          epochs=epochs[2],
+                                          batch_size=batch_size,
+                                          callbacks=[checkpoint],
+                                          verbose=2,
+                                          class_weight=class_weight)
             history.append(model_history)
             i += 1
             del model_CNN
             gc.collect()
         except Exception as e:
             print(f"\nCheck the Error \n {e}")
-            print(f"Error in CNN-{i} model trying to re-generate another model")
+            print(
+                f"Error in CNN-{i} model trying to re-generate another model")
             if max_hidden_layer_cnn > 5:
                 max_hidden_layer_cnn -= 1
             if max_nodes_cnn > 128:
@@ -338,9 +352,9 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 
 
 def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
-                sparse_categorical=True, random_deep=[3, 3, 3],
-                models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
-                text_tokenizer_filepath="text_tokenizer.pickle", return_probs=False):
+            sparse_categorical=True, random_deep=[3, 3, 3],
+            models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+            text_tokenizer_filepath="text_tokenizer.pickle", return_probs=False):
     """
     predict(x_test, number_of_classes, weighted_prediction, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
@@ -385,15 +399,17 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
 
     if random_deep[0] != 0:
         x_test_tf_idf = txt.get_tf_idf_vectors(x_test,
-                                                max_num_words=max_num_words,
-                                                fit=False,
-                                                vectorizer_filepath=tf_idf_vectorizer_filepath)
+                                               max_num_words=max_num_words,
+                                               fit=False,
+                                               vectorizer_filepath=tf_idf_vectorizer_filepath,
+                                               vectorizer=vectorizer)
     if random_deep[1] != 0 or random_deep[2] != 0:
         x_test_tokenized, _ = txt.tokenize(x_test,
-                                            max_num_words=max_num_words,
-                                            max_seq_len=max_seq_len,
-                                            fit=False,
-                                            tokenizer_filepath=text_tokenizer_filepath)
+                                           max_num_words=max_num_words,
+                                           max_seq_len=max_seq_len,
+                                           fit=False,
+                                           tokenizer_filepath=text_tokenizer_filepath,
+                                           tokenizer=tokenizer)
 
     del x_test
     gc.collect()
@@ -401,22 +417,27 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
             try:
+                model = None
+                if i < len(models) & & j < len(models[i]):
+                    model = models[i][j]
                 print(f"\nPredicting Using {util.model_type[i]}-{j}")
                 model_arch_file = f"{util.model_type[i]}_{j}.json"
                 model_weights_file = f"{util.model_type[i]}_{j}.hdf5"
                 model_arch_filepath = os.path.join(models_dir, model_arch_file)
-                model_weights_filepath = os.path.join(models_dir, model_weights_file)
+                model_weights_filepath = os.path.join(
+                    models_dir, model_weights_file)
                 if i == 0:
                     x_test = x_test_tf_idf
                 else:
                     x_test = x_test_tokenized
                 y_pred = predict_single_model(x_test,
-                                                number_of_classes,
-                                                weighted_prediction,
-                                                model_arch_filepath,
-                                                model_weights_filepath,
-                                                batch_size=batch_size,
-                                                sparse_categorical=sparse_categorical)
+                                              number_of_classes,
+                                              weighted_prediction,
+                                              model_arch_filepath=model_arch_filepath,
+                                              model_weights_filepath=model_weights_filepath,
+                                              batch_size=batch_size,
+                                              sparse_categorical=sparse_categorical,
+                                              model=model)
                 models_y_pred[f"{util.model_type[i]}-{j}"] = y_pred
             except Exception as e:
                 print(f"\nCheck the Error \n {e}")
@@ -455,9 +476,9 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
 
 
 def evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
-                sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
-                tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
-                text_tokenizer_filepath="text_tokenizer.pickle"):
+             sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
+             tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+             text_tokenizer_filepath="text_tokenizer.pickle"):
     """
     evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
                         sparse_categorical=True, random_deep=[3, 3, 3], plot=False, models_dir="models",
@@ -510,3 +531,24 @@ def evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_
                                     text_tokenizer_filepath=text_tokenizer_filepath)
     score.report_score(y_test, y_pred, models_y_pred, plot=plot)
     return y_pred
+
+
+def read_models(random_deep, models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
+                text_tokenizer_filepath="text_tokenizer.pickle"):
+    with open(tokenizer_filepath, "rb") as text_tokenizer_file:
+                tokenizer = pickle.load(text_tokenizer_file)
+    with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
+                vectorizer = pickle.load(tf_idf_vectorizer_file)
+    for i in range(len(random_deep)):
+        for j in range(random_deep[i]):
+            print(f"\nReading Model {util.model_type[i]}-{j}")
+            model_arch_file = f"{util.model_type[i]}_{j}.json"
+            model_weights_file = f"{util.model_type[i]}_{j}.hdf5"
+            model_arch_filepath = os.path.join(models_dir, model_arch_file)
+            model_weights_filepath = os.path.join(
+                models_dir, model_weights_file)
+            with open(model_arch_filepath, "r") as model_json:
+                loaded_model_json = model_json.read()
+            model = model_from_json(loaded_model_json)
+            model.load_weights(model_weights_filepath)
+            models[i].append(model)

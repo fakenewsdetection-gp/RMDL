@@ -112,7 +112,7 @@ def get_one_hot_values(labels):
     return np.array(encoded)
 
 
-def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_filepath=None):
+def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer=None, tokenizer_filepath=None):
     np.random.seed(7)
     if fit:
         tokenizer = Tokenizer(num_words=max_num_words)
@@ -120,7 +120,7 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer_fil
         with open("text_tokenizer.pickle", "wb") as text_tokenizer_file:
             pickle.dump(tokenizer, text_tokenizer_file)
     else:
-        if tokenizer_filepath is not None:
+        if tokenizer is not None and tokenizer_filepath is not None:
             with open(tokenizer_filepath, "rb") as text_tokenizer_file:
                 tokenizer = pickle.load(text_tokenizer_file)
         else:
@@ -149,18 +149,18 @@ def get_word_embedding_index(glove_filepath, word_index):
     return embedding_index
 
 
-def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer_filepath=None):
+def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer=None, vectorizer_filepath=None):
     if fit:
         vectorizer = TfidfVectorizer(max_features=max_num_words)
         text_tf_idf = vectorizer.fit_transform(text).toarray()
         with open("tf_idf_vectorizer.pickle", "wb") as tf_idf_vectorizer_file:
             pickle.dump(vectorizer, tf_idf_vectorizer_file)
-    else:
-        if vectorizer_filepath is not None:
+    else:            
+        if vectorizer is None and vectorizer_filepath is not None:
             vectorizer = None
             with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
                 vectorizer = pickle.load(tf_idf_vectorizer_file)
-            text_tf_idf = vectorizer.transform(text).toarray()
         else:
             raise Exception("Pickle file for tf-idf vectorizer is not specified.")
+        text_tf_idf = vectorizer.transform(text).toarray()
     return text_tf_idf
