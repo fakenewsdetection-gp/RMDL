@@ -69,7 +69,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
           min_hidden_layer_dnn=1, max_hidden_layer_dnn=6, min_nodes_dnn=128, max_nodes_dnn=1024,
           min_hidden_layer_rnn=1, max_hidden_layer_rnn=5, min_nodes_rnn=128, max_nodes_rnn=512,
           min_hidden_layer_cnn=3, max_hidden_layer_cnn=10, min_nodes_cnn=128, max_nodes_cnn=512,
-          random_state=42, random_optimizor=True, dropout=0.5, dnn_l2=0, rnn_l2=0.01, cnn_l2=0.01):
+          random_state=42, random_optimizor=True, dropout=0.5, dnn_l2=0, rnn_l2=0.01, cnn_l2=0.01, use_cuda=True, use_bidirectional=True):
     """
     train(x_train, y_train, x_val, y_val, class_weight=None batch_size=128,
             embedding_dim=50, max_seq_len=500, max_num_words=75000,
@@ -263,7 +263,10 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
                                                                        min_nodes_rnn,
                                                                        max_nodes_rnn,
                                                                        random_optimizor,
-                                                                       dropout, _l2=rnn_l2)
+                                                                       dropout,
+                                                                       _l2=rnn_l2,
+                                                                       use_cuda=use_cuda,
+                                                                       use_bidirectional=use_bidirectional)
             model_arch_file = f"RNN_{i}.json"
             model_weights_file = f"RNN_{i}.hdf5"
             model_json = model_tmp_RNN.to_json()
@@ -539,12 +542,13 @@ def reset_models():
     vectorizer = None
     tokenizer = None
 
+
 def read_models(random_deep, models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     with open(text_tokenizer_filepath, "rb") as text_tokenizer_file:
-                tokenizer = pickle.load(text_tokenizer_file)
+        tokenizer = pickle.load(text_tokenizer_file)
     with open(tf_idf_vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
-                vectorizer = pickle.load(tf_idf_vectorizer_file)
+        vectorizer = pickle.load(tf_idf_vectorizer_file)
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
             print(f"\nReading Model {util.model_type[i]}-{j}")

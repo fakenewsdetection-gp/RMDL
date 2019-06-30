@@ -22,7 +22,7 @@ import numpy as np
 from keras.models import Sequential, Model
 from keras.constraints import maxnorm
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling2D, MaxPooling1D, Embedding,\
-        Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Bidirectional
+        Dropout, TimeDistributed, Conv2D, Activation, CuDNNLSTM, CuDNNGRU, Input, Bidirectional, GRU
 from keras.regularizers import l2
 from keras.layers.core import Lambda
 from keras.layers.merge import Concatenate
@@ -303,7 +303,7 @@ def Build_Model_RNN_Image(shape,
 
 
 def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
-                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout, _l2=0.01):
+                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout, use_cuda=True, use_bidirectional=True, _l2=0.01):
     """
     def buildModel_RNN(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):
     word_index in word index ,
@@ -311,6 +311,8 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     number_of_classes is number of classes,
     MAX_SEQUENCE_LENGTH is maximum lenght of text sequences
     """
+
+    Recurrent = CuDNNGRU if use_cuda else GRU
 
     model = Sequential()
     values = list(range(min_nodes_rnn, max_nodes_rnn + 1))
@@ -338,9 +340,15 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
     gru_node = random.choice(values)
     print(gru_node)
     for i in range(0,layer):
-        model.add(Bidirectional(CuDNNGRU(gru_node,return_sequences=True, kernel_regularizer=l2(_l2))))
+        if use_bidirectional:
+            model.add(Bidirectional(Recurrent(gru_node,return_sequences=True, kernel_regularizer=l2(_l2))))
+        else:
+            model.add(Recurrent(gru_node,return_sequences=True, kernel_regularizer=l2(_l2)))
         model.add(Dropout(dropout))
-    model.add(Bidirectional(CuDNNGRU(gru_node, kernel_regularizer=l2(_l2))))
+    if use_bidirectional:
+        model.add(Bidirectional(Recurrent(gru_node, kernel_regularizer=l2(_l2))))
+    else:
+        model.add(Recurrent(gru_node, kernel_regularizer=l2(_l2)))
     model.add(Dropout(dropout))
     model.add(Dense(256, activation='relu', kernel_regularizer=l2(_l2)))
     if number_of_classes == 2:
