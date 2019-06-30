@@ -418,7 +418,7 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
         for j in range(random_deep[i]):
             try:
                 model = None
-                if i < len(models) & & j < len(models[i]):
+                if i < len(models) & j < len(models[i]):
                     model = models[i][j]
                 print(f"\nPredicting Using {util.model_type[i]}-{j}")
                 model_arch_file = f"{util.model_type[i]}_{j}.json"
