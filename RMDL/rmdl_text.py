@@ -14,6 +14,7 @@ RMDL: Random Multimodel Deep Learning for Classification
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 import os
+import pickle
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import gc
 import os
@@ -540,9 +541,9 @@ def reset_models():
 
 def read_models(random_deep, models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
-    with open(tokenizer_filepath, "rb") as text_tokenizer_file:
+    with open(text_tokenizer_filepath, "rb") as text_tokenizer_file:
                 tokenizer = pickle.load(text_tokenizer_file)
-    with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
+    with open(tf_idf_vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
                 vectorizer = pickle.load(tf_idf_vectorizer_file)
     for i in range(len(random_deep)):
         for j in range(random_deep[i]):
