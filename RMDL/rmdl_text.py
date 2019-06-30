@@ -533,6 +533,11 @@ def evaluate(x_test, y_test, weighted_prediction=False, batch_size=128, max_seq_
     return y_pred
 
 
+def reset_models():
+    models = [[], [], []]
+    vectorizer = None
+    tokenizer = None
+
 def read_models(random_deep, models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
                 text_tokenizer_filepath="text_tokenizer.pickle"):
     with open(tokenizer_filepath, "rb") as text_tokenizer_file:
