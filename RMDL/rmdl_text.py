@@ -340,7 +340,7 @@ def train(x_train, y_train, x_val, y_val, class_weight=None, batch_size=128,
 def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128, max_seq_len=500, max_num_words=75000,
                 sparse_categorical=True, random_deep=[3, 3, 3],
                 models_dir="models", tf_idf_vectorizer_filepath="tf_idf_vectorizer.pickle",
-                text_tokenizer_filepath="text_tokenizer.pickle"):
+                text_tokenizer_filepath="text_tokenizer.pickle", return_probs=False):
     """
     predict(x_test, number_of_classes, weighted_prediction, batch_size=128, max_seq_len=500, max_num_words=75000,
                     sparse_categorical=True, random_deep=[3, 3, 3],
@@ -433,11 +433,13 @@ def predict(x_test, number_of_classes, weighted_prediction=False, batch_size=128
         if number_of_classes == 2:
             y_probs = np.squeeze(y_probs, axis=0)
             y_probs = np.mean(y_probs, axis=1)
-            y_pred = np.array(np.rint(y_probs), dtype="int32").tolist()
+            if not return_probs:
+                y_pred = np.array(np.rint(y_probs), dtype="int32").tolist()
         else:
             if not sparse_categorical:
                 y_probs = np.mean(y_probs, axis=1)
-                y_pred = np.argmax(y_probs, axis=1).tolist()
+                if not return_probs:
+                    y_pred = np.argmax(y_probs, axis=1).tolist()
             else:
                 # with sparse categorical this method cannot be used.
                 pass
