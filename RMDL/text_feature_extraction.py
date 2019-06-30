@@ -120,10 +120,10 @@ def tokenize(text, max_num_words=75000, max_seq_len=500, fit=True, tokenizer=Non
         with open("text_tokenizer.pickle", "wb") as text_tokenizer_file:
             pickle.dump(tokenizer, text_tokenizer_file)
     else:
-        if tokenizer is not None and tokenizer_filepath is not None:
+        if tokenizer is None and tokenizer_filepath is not None:
             with open(tokenizer_filepath, "rb") as text_tokenizer_file:
                 tokenizer = pickle.load(text_tokenizer_file)
-        else:
+        elif tokenizer is None:
             raise Exception("Pickle file for text tokenizer is not specified.")
     word_index = tokenizer.word_index
     sequences = tokenizer.texts_to_sequences(text)
@@ -160,7 +160,7 @@ def get_tf_idf_vectors(text, max_num_words=75000, fit=True, vectorizer=None, vec
             vectorizer = None
             with open(vectorizer_filepath, "rb") as tf_idf_vectorizer_file:
                 vectorizer = pickle.load(tf_idf_vectorizer_file)
-        else:
+        elif vectorizer is None:
             raise Exception("Pickle file for tf-idf vectorizer is not specified.")
         text_tf_idf = vectorizer.transform(text).toarray()
     return text_tf_idf
