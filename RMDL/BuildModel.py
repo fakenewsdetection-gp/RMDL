@@ -32,9 +32,9 @@ import keras_metrics as km
 import random
 
 
-def optimizors(random_optimizor):
+def optimizors(random_optimizor, lr=1e-3):
     if random_optimizor:
-        i = random.randint(1,3)
+        i = random.randint(0,4)
         if i==0:
             opt = optimizers.SGD()
         elif i==1:
@@ -47,7 +47,7 @@ def optimizors(random_optimizor):
             opt =optimizers.Nadam()
         print(opt)
     else:
-        opt= optimizers.Adam()
+        opt= optimizers.Adam(lr)
     return opt
 
 
@@ -142,7 +142,7 @@ def Build_Model_DNN_Image(shape, number_of_classes, sparse_categorical, min_hidd
 
 def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
                          min_hidden_layer_dnn, max_hidden_layer_dnn, min_nodes_dnn,
-                         max_nodes_dnn, random_optimizor, dropout, _l2=0.01):
+                         max_nodes_dnn, random_optimizor, dropout, _l2=0.01, lr=1e-3):
     """
     buildModel_DNN_Tex(shape, number_of_classes,sparse_categorical)
     Build Deep neural networks Model for text classification
@@ -168,7 +168,7 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
         model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
         model_tmp = model
         model.compile(loss='binary_crossentropy',
-                        optimizer=optimizors(random_optimizor),
+                        optimizer=optimizors(random_optimizor, lr),
                         metrics=['accuracy', km.binary_precision(), km.binary_recall(),
                                     km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                     km.binary_false_positive(), km.binary_false_negative()])
@@ -177,14 +177,14 @@ def Build_Model_DNN_Text(shape, number_of_classes, sparse_categorical,
         model_tmp = model
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
-                          optimizer=optimizors(random_optimizor),
+                          optimizer=optimizors(random_optimizor, lr),
                           metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
                                     km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
                                     km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
                                     km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
-                          optimizer=optimizors(random_optimizor),
+                          optimizer=optimizors(random_optimizor, lr),
                           metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
                                     km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
                                     km.categorical_false_positive(), km.categorical_false_negative()])
@@ -303,7 +303,7 @@ def Build_Model_RNN_Image(shape,
 
 
 def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
-                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout, use_cuda=True, use_bidirectional=True, _l2=0.01):
+                         min_hidden_layer_rnn, max_hidden_layer_rnn, min_nodes_rnn, max_nodes_rnn, random_optimizor, dropout, use_cuda=True, use_bidirectional=True, _l2=0.01, lr=1e-3):
     """
     def buildModel_RNN(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical):
     word_index in word index ,
@@ -355,7 +355,7 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
         model_tmp = model
         model.compile(loss='binary_crossentropy',
-                        optimizer=optimizors(random_optimizor),
+                        optimizer=optimizors(random_optimizor, lr),
                         metrics=['accuracy', km.binary_precision(), km.binary_recall(),
                                     km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                     km.binary_false_positive(), km.binary_false_negative()])
@@ -364,14 +364,14 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         model_tmp = model
         if sparse_categorical:
             model.compile(loss='sparse_categorical_crossentropy',
-                          optimizer=optimizors(random_optimizor),
+                          optimizer=optimizors(random_optimizor, lr),
                           metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
                                     km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
                                     km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
                                     km.sparse_categorical_false_negative()])
         else:
             model.compile(loss='categorical_crossentropy',
-                          optimizer=optimizors(random_optimizor),
+                          optimizer=optimizors(random_optimizor, lr),
                           metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
                                     km.categorical_f1_score(), km.categorical_true_positive(), km.categorical_true_negative(),
                                     km.categorical_false_positive(), km.categorical_false_negative()])
@@ -380,7 +380,7 @@ def Build_Model_RNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
 
 def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQUENCE_LENGTH, EMBEDDING_DIM, sparse_categorical,
                        min_hidden_layer_cnn, max_hidden_layer_cnn, min_nodes_cnn, max_nodes_cnn, random_optimizor,
-                       dropout, simple_model=False, _l2=0.01):
+                       dropout, simple_model=False, _l2=0.01, lr=1e-3):
 
     """
         def buildModel_CNN(word_index,embedding_index,number_of_classes,MAX_SEQUENCE_LENGTH,EMBEDDING_DIM,Complexity=0):
@@ -429,7 +429,7 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
             model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(_l2)))
             model_tmp = model
             model.compile(loss='binary_crossentropy',
-                            optimizer=optimizors(random_optimizor),
+                            optimizer=optimizors(random_optimizor, lr),
                             metrics=['accuracy', km.binary_precision(), km.binary_recall(),
                                         km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                         km.binary_false_positive(), km.binary_false_negative()])
@@ -438,14 +438,14 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
             model_tmp = model
             if sparse_categorical:
                 model.compile(loss='sparse_categorical_crossentropy',
-                              optimizer=optimizors(random_optimizor),
+                              optimizer=optimizors(random_optimizor, lr),
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
                                         km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
                                         km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
                                         km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
-                              optimizer=optimizors(random_optimizor),
+                              optimizer=optimizors(random_optimizor, lr),
                               metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
                                         km.categorical_f1_score(), km.categorical_true_positive(),km.categorical_true_negative(),
                                         km.categorical_false_positive(), km.categorical_false_negative()])
@@ -505,21 +505,21 @@ def Build_Model_CNN_Text(word_index, embedding_index, number_of_classes, MAX_SEQ
         model_tmp = model
         if number_of_classes == 2:
             model.compile(loss='binary_crossentropy',
-                            optimizer=optimizors(random_optimizor),
+                            optimizer=optimizors(random_optimizor, lr),
                             metrics=['accuracy', km.binary_precision(), km.binary_recall(),
                                         km.binary_f1_score(), km.binary_true_positive(), km.binary_true_negative(),
                                         km.binary_false_positive(), km.binary_false_negative()])
         else:
             if sparse_categorical:
                 model.compile(loss='sparse_categorical_crossentropy',
-                              optimizer=optimizors(random_optimizor),
+                              optimizer=optimizors(random_optimizor, lr),
                               metrics=['accuracy', km.sparse_categorical_precision(), km.sparse_categorical_recall(),
                                         km.sparse_categorical_f1_score(), km.sparse_categorical_true_positive(),
                                         km.sparse_categorical_true_negative(), km.sparse_categorical_false_positive(),
                                         km.sparse_categorical_false_negative()])
             else:
                 model.compile(loss='categorical_crossentropy',
-                              optimizer=optimizors(random_optimizor),
+                              optimizer=optimizors(random_optimizor, lr),
                               metrics=['accuracy', km.categorical_precision(), km.categorical_recall(),
                                         km.categorical_f1_score(), km.categorical_true_positive(),km.categorical_true_negative(),
                                         km.categorical_false_positive(), km.categorical_false_negative()])
